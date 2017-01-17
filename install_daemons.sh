@@ -3,10 +3,11 @@ cd postgres
 git checkout REL9_5_STABLE
 ./configure --prefix=$HOME/$1
 make
+cd postgres
 make install
 cd ~
 curl http://www-eu.apache.org/dist//httpd/httpd-2.4.25.tar.bz2 > httpd-2.4.25.tar.bz2
-tar -xvfj httpd-2.4.25.tar.bz2 
+tar xvfj httpd-2.4.25.tar.bz2 
 cd httpd-2.4.25.25
 ./configure --prefix=$HOME/$1
 make
