@@ -1,0 +1,2 @@
+I wrote my create_tables.sql script in sublime.  Anytime I tried and copied it to VIM to run it in my VB I would get syntax errors.  
+I'm going to keep working on this so I can get it done but I was overwhelmed with this assignment for sure.
