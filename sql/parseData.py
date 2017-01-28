@@ -1,32 +1,14 @@
-import sys
-import csv
+import pandas as pd
+import numpy as np
+import sys 
 
 first_arg = sys.argv[1]
+df = pd.read_csv(first_arg)
 
-f1 = open(first_arg)  #the code for DC_inventory.csv
-csv_f = csv.reader(f1)
-col_1 = list(zip(*csv_f))
-# print(col_1)
-dcInventoryList = []
-for row in col_1:
-	dcInventoryList.append(row)
 
-asset_pk = []
-skip_name = True
-for word in dcInventoryList[0]:
-	if not skip_name:
-		asset_pk.append(word)
-	else :
-		skip_name = False
+print(df['asset tag'])
+print(df['compartments'])
+print(df['intake date'][0])
 
-compartment_pk = []
-skip_name = True
-for word in dcInventoryList[3]:
-	if not skip_name:
-		compartment_pk.append(word)
-	else :
-		skip_name = False
 
-print(asset_pk)
-print(compartment_pk)
 
