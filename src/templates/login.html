@@ -1,0 +1,24 @@
+{% block body %}
+<title>login</title>
+<div class="container">
+  <div class="row">
+    <div>
+    <br>
+      <form class="form-signin" action="/login/" method="POST">
+        <h1 id="logo" class="form-signin-heading">Login</h1>
+        <div class="input-group">
+          <span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span>
+          <input name="username" class="form-control" type="text" placeholder="Username">
+        </div> <br>
+        <div class="input-group">
+          <span class="input-group-addon"><i class="fa fa-key fa-fw"></i></span>
+          <input name="password" type="password" class="form-control" type="password" placeholder="Password">
+        </div> <br>
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button> <br/>
+      </form>
+    </div>
+  </div>
+  <br>
+</div>
+
+{% endblock %}
