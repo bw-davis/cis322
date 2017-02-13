@@ -9,6 +9,10 @@ def index():
 def hello():
     return render_template('reportQuery.html')
 
+@app.route("/rest")
+def suspend_user():
+	return render_template('rest.html')
+
 @app.route("/rest/suspend_user", methods=('POST',))
 def suspend_user():
 	if request.method=='POST' and 'arguments' in request.form:
