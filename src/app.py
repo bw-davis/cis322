@@ -1,73 +1,39 @@
 from flask import Flask, flash, redirect, render_template, request, session, abort
 import json
+import os
+import pathlib
+import psycopg2
+
 app = Flask(__name__)
- 
-@app.route("/")
-def index():
-    return render_template('login.html')
- 
-@app.route("/report_filter")
-def hello():
-    return render_template('reportQuery.html')
+global dbhost, dbname, dbport
 
-@app.route("/rest")
-def rest():
-	return render_template('rest.html')
+@app.route("/create_user", methods=['POST', 'GET'])
+def create_user():
+    error = None
+    if request.method == 'GET':
+        return render_template('create_user.html')
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        conn = psycopg2.connect("dbname=%(dbname)s host=%(dbhost)s port=%(dbport)s")
+        cur = conn.cursor
+        cur.execute("SELECT * from users where user_pk=%(username)s")
+        row = cur.fetchall()
+        if row:
+            error = 'Username is already taken.  Please try another'
+        else:
+            cur.execute("INSERT into users VALUES (%(username)s, %(password)s")  
+        conn.commit()
+        cur.close()
+        conn.close()
+    return render_template('create_user.html', error=error)
 
-@app.route("/rest/lost_key", methods=('POST',))
-def rest_key():
-    if request.method=='POST' and 'arguments' in request.form:
-        data=request.form['arguments']
-    return returnJson(theRequest)
-
-@app.route("/rest/activate_user", methods=('POST',))
-def activate_user():
-    if request.method=='POST' and 'arguments' in request.form:
-        data=request.form['arguments']
-    return returnJson(theRequest)
-
-@app.route('/rest/suspend_user', methods=('POST',))
-def suspend_user():
-    if request.method=='POST' and 'arguments' in request.form:
-        theRequest=json.loads(request.form['arguments'])
-    return returnJson(theRequest)
-
-@app.route("/rest/list_products", methods=('POST',))
-def list_products():
-    if request.method=='POST' and 'arguments' in request.form:
-        data=request.form['arguments']
-    return returnJson(theRequest)
-
-@app.route("/rest/add_products", methods=('POST',))
-def add_products():
-    if request.method=='POST' and 'arguments' in request.form:
-        data=request.form['arguments']
-    return returnJson(theRequest)
-
-@app.route("/rest/add_asset", methods=('POST',))
-def add_asset():
-    if request.method=='POST' and 'arguments' in request.form:
-        data=request.form['arguments']
-    return returnJson(theRequest)
-
-@app.route("/facility_inventory_report")
-def getInventoryReports():
-    return render_template('facilityInventory.html')
- 
-@app.route("/in_transit_report")
-def getInTransitReports():				#can put variables in these functions 
-    return render_template('inTransit.html')
-
-@app.route("/logout")
-def logout():
-    return render_template('logout.html')
-
-def returnJson(req):
-    theData = dict()
-    theData['timestamp'] = req['timestamp']
-    theData['result'] = 'OK'
-    returnJson = json.dumps(theData)
-    return theData
  
 if __name__ == "__main__":
+    cpath = pathlib.Path(os.path.realpath(__file__)).parent.joinpath('lost_config.json')
+    with cpath.open() as conf:
+        c = json.load(conf)
+        dbhost = c['database']['dbhost']
+        dbport = c['database']['dbport']
+        dbname = c['database']['dbname']
     app.run()
