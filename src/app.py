@@ -15,7 +15,7 @@ def create_user():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        conn = psycopg2.connect("dbname=%(dbname)s host=%(dbhost)s port=%(dbport)s")
+        conn = psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
         cur = conn.cursor
         cur.execute("SELECT * from users where user_pk=%(username)s")
         row = cur.fetchall()
@@ -28,6 +28,28 @@ def create_user():
         conn.close()
     return render_template('create_user.html', error=error)
 
+@app.route("/login", methods=['POST', 'GET'])
+def create_user():
+    error = None
+    if request.method == 'GET':
+        return render_template('login.html')
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        conn = psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
+        cur = conn.cursor
+        cur.execute("SELECT password from users where user_pk=%(username)s")
+        rows = cur.fetchall()
+        for row in rows:
+            if row:
+                if row == password
+                return render_template('dashboard.html', data='username')
+            else:
+                error = 'Username and Password do not match.  Please try again.' 
+        conn.commit()
+        cur.close()
+        conn.close()
+    return render_template('login.html', error=error)
  
 if __name__ == "__main__":
     cpath = pathlib.Path(os.path.realpath(__file__)).parent.joinpath('lost_config.json')

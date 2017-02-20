@@ -1,13 +1,13 @@
 <html>
   <head>
-    <title>Flask Intro - login page</title>
+    <title>Create User</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
   </head>
   <body>
     <div class="container">
       <h1>Please Create User</h1>
       <br>
-      <form action="" method="post">
+      <form action="http://127.0.0.1:5000/create_user" method="post">
         <input type="text" placeholder="Username" name="username" value="{{
           request.form.username }}">
          <input type="password" placeholder="Password" name="password" value="{{

@@ -1,5 +1,2 @@
 -templates directory holds all of the .html templates
--app.py is how the web application is run using python3 from command line or preflight.sh will also start it
--did not get done with all of the data parsing from assignment 2, having a hard time, so I switched gears toward the FLask app.
--No data is inputted into the created tables
--I have all 5 views created and they are loadable from the local host
+-app.py is how the web application is run using python3 from command line

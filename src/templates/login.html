@@ -1,24 +1,22 @@
-{% block body %}
-<title>login</title>
-<div class="container">
-  <div class="row">
-    <div>
-    <br>
-      <form class="form-signin" action="/login/" method="POST">
-        <h1 id="logo" class="form-signin-heading">Login</h1>
-        <div class="input-group">
-          <span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span>
-          <input name="username" class="form-control" type="text" placeholder="Username">
-        </div> <br>
-        <div class="input-group">
-          <span class="input-group-addon"><i class="fa fa-key fa-fw"></i></span>
-          <input name="password" type="password" class="form-control" type="password" placeholder="Password">
-        </div> <br>
-        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button> <br/>
+<html>
+  <head>
+    <title>Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  </head>
+  <body>
+    <div class="container">
+      <h1>Please Login</h1>
+      <br>
+      <form action="http://127.0.0.1:5000/login" method="post">
+        <input type="text" placeholder="Username" name="username" value="{{
+          request.form.username }}">
+         <input type="password" placeholder="Password" name="password" value="{{
+          request.form.password }}">
+        <input class="btn btn-default" type="submit" value="Login">
       </form>
+      {% if error %}
+        <p class="error"><strong>Error:</strong> {{ error }}
+      {% endif %}
     </div>
-  </div>
-  <br>
-</div>
-
-{% endblock %}
+  </body>
+</html>
