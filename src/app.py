@@ -42,7 +42,7 @@ def create_user():
         rows = cur.fetchall()
         for row in rows:
             if row:
-                if row == password
+                if row == password:
                 return render_template('dashboard.html', data='username')
             else:
                 error = 'Username and Password do not match.  Please try again.' 
