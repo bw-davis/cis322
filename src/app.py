@@ -43,7 +43,7 @@ def create_user():
         for row in rows:
             if row:
                 if row == password:
-                return render_template('dashboard.html', data='username')
+                    return render_template('dashboard.html', data='username')
             else:
                 error = 'Username and Password do not match.  Please try again.' 
         conn.commit()
