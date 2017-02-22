@@ -29,7 +29,7 @@ def create_user():
     return render_template('create_user.html', error=error)
 
 @app.route("/login", methods=['POST', 'GET'])
-def create_user():
+def login():
     error = None
     if request.method == 'GET':
         return render_template('login.html')
