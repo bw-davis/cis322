@@ -7,7 +7,7 @@ import psycopg2
 app = Flask(__name__)
 global dbhost, dbname, dbport
 
-@app.route("/create_user", methods=['POST', 'GET'])
+@app.route("/create_user", methods=('POST', 'GET',))
 def create_user():
     error = None
     if request.method == 'GET':
@@ -26,8 +26,9 @@ def create_user():
         conn.commit()
         cur.close()
         conn.close()
-    return render_template('create_user.html', error=error)
+    return render_template('login.html', error=error)
 
+@app.route("/")
 @app.route("/login", methods=['POST', 'GET'])
 def login():
     error = None
