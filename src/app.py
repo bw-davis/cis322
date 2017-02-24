@@ -14,15 +14,18 @@ def create_user():
         return render_template('create_user.html')
     if request.method == 'POST':
         username = request.form['username']
+        print(username)
         password = request.form['password']
+        print(password)
         conn = psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
         cur = conn.cursor
-        cur.execute("SELECT * from users where user_pk=%s", (username, ))
+        cur.execute("select * from users where user_pk=%s", (username, ))
         row = cur.fetchall()
         if row:
+            print(row)
             error = 'Username is already taken.  Please try another'
         else:
-            cur.execute("INSERT into users VALUES (%s, %s)", (username, password, ))  
+            cur.execute("insert into users values (%s, %s)", (username, password, ))  
         conn.commit()
         cur.close()
         conn.close()
@@ -40,7 +43,7 @@ def login():
         password = request.form['password']
         conn = psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
         cur = conn.cursor
-        cur.execute("SELECT password from users where user_pk=%s", (username, ))
+        cur.execute("select password from users where user_pk=%s", (username, ))
         rows = cur.fetchall()
         for row in rows:
             if row:
