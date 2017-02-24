@@ -7,33 +7,35 @@ from config import dbname, dbhost, dbport
 
 app = Flask(__name__)
 
-@app.route("/create_user", methods=('POST', 'GET',))
+@app.route("/create_user", methods=('GET', 'POST',))
 def create_user():
     error = None
     if request.method == 'GET':
+        print("hey brian")
         return render_template('create_user.html')
     if request.method == 'POST':
+        print("we're in the post part!")
         username = request.form['username']
         print(username)
         password = request.form['password']
         print(password)
-        conn = psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
-        cur = conn.cursor
-        cur.execute("select * from users where user_pk=%s", (username, ))
-        row = cur.fetchall()
-        if row:
-            print(row)
-            error = 'Username is already taken.  Please try another'
-        else:
-            cur.execute("insert into users values (%s, %s)", (username, password, ))  
-        conn.commit()
-        cur.close()
-        conn.close()
-        return render_template('dashboard.html', data='username')
+        with psycopg2.connect(dbname=dbname, host=dbhost, port=dbport) as conn:
+            cur = conn.cursor
+            cur.execute("select * from users where user_pk=%s", (username, ))
+            row = cur.fetchall()
+            if row:
+                print(row)
+                error = 'Username is already taken.  Please try another'
+            else:
+                cur.execute("insert into users values (%s, %s)", (username, password, ))  
+            conn.commit()
+            cur.close()
+            conn.close()
+            return render_template('dashboard.html')
     return render_template('login.html', error=error)
 
 @app.route("/")
-@app.route("/login", methods=['POST', 'GET'])
+@app.route("/login", methods=('GET', 'POST', ))
 def login():
     error = None
     if request.method == 'GET':
@@ -56,7 +58,7 @@ def login():
         conn.close()
     return render_template('login.html', error=error)
 
-@app.route("/dashboard")
+@app.route("/dashboard", methods=('GET', ))
 def dashboard():
     return render_template('dashboard.html')
  
