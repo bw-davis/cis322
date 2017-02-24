@@ -7,11 +7,9 @@
     <div class="container">
       <h1>Please Create User</h1>
       <br>
-      <form action="http://127.0.0.1:8080/create_user" method="post">
-        <input type="text" placeholder="Username" name="username" value="{{
-          request.form.username }}">
-         <input type="password" placeholder="Password" name="password" value="{{
-          request.form.password }}">
+      <form action="{{url_for('create_user')}}" method="POST">
+        <input type="TEXT" placeholder="Username" name="username">
+         <input type="PASSWORD" placeholder="Password" name="password">
         <input class="btn btn-default" type="submit" value="Create">
       </form>
       {% if error %}

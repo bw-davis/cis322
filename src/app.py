@@ -10,10 +10,10 @@ app = Flask(__name__)
 @app.route("/create_user", methods=('GET', 'POST',))
 def create_user():
     error = None
-    if request.method == 'GET':
+    if request.method=='GET':
         print("hey brian")
         return render_template('create_user.html')
-    if request.method == 'POST':
+    if request.method=='POST':
         print("we're in the post part!")
         username = request.form['username']
         print(username)
@@ -23,11 +23,12 @@ def create_user():
             cur = conn.cursor
             cur.execute("select * from users where user_pk=%s", (username, ))
             row = cur.fetchall()
-            if row:
-                print(row)
-                error = 'Username is already taken.  Please try another'
-            else:
-                cur.execute("insert into users values (%s, %s)", (username, password, ))  
+            # if row:
+            #     print(row)
+            #     error = 'Username is already taken.  Please try another'
+            # else:
+            #     cur.execute("insert into users values (%s, %s)", (username, password, ))  
+            cur.execute("insert into users values (%s, %s)", (username, password, ))
             conn.commit()
             cur.close()
             conn.close()
@@ -38,9 +39,9 @@ def create_user():
 @app.route("/login", methods=('GET', 'POST', ))
 def login():
     error = None
-    if request.method == 'GET':
+    if request.method=='GET':
         return render_template('login.html')
-    if request.method == 'POST':
+    if request.method=='POST':
         username = request.form['username']
         password = request.form['password']
         conn = psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
