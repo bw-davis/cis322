@@ -3,7 +3,7 @@ import json
 import os
 import pathlib
 import psycopg2
-from config import dbname, dbhost, dbport
+from configure import dbname, dbhost, dbport
 
 app = Flask(__name__)
 
