@@ -41,15 +41,19 @@ def login():
         password = request.form['password']
         conn = psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
         cur = conn.cursor()
-        cur.execute("select password from users where user_pk=%s;", (username))
-        rows = cur.fetchone()
-        for row in rows:
-            if row == password:
-                return render_template('dashboard.html')
-            else:
-                error = 'Username and Password do not match.  Please try again.'
-        cur.close()
-        conn.close()
+        cur.execute("select (count)* from users where user_pk=%s and password=%s;", (username, password))
+        rows = cur.fetchone()[0]
+        if rows != 1:
+            error = "Username and Password do not match. Please try again."
+        # for row in rows:
+        #     if row == password:
+        #         return render_template('dashboard.html')
+        #     else:
+        #         error = 'Username and Password do not match.  Please try again.'
+            cur.close()
+            conn.close()
+        else:
+            return render_template('dashboard.html')
     return render_template('login.html', error=error)
 
 @app.route("/dashboard", methods=('GET', ))
