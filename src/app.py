@@ -16,17 +16,15 @@ def create_user():
     if request.method=='POST':
         username = request.form['username']
         password = request.form['password']
-        conn =  psycopg2.connect(dbname="lost", host="/tmp", port=5432)
-        cur = conn.cursor
+        conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
+        cur = conn.cursor()
             #cur.execute("select * from users where user_pk=%s;", (username))
             #row = cur.fetchall()
             # if row:
             #     print(row)
             #     error = 'Username is already taken.  Please try another'
             # else:
-        cur.execute("insert into users values ('frank', 'beamer');")
-            #cur.execute("insert into users values (%s, %s)", (username, passwor))  
-            #cur.execute("insert into users values (%s, %s);", (username, password))
+        cur.execute("insert into users values (%s, %s);", (username, password))
         conn.commit()
         cur.close()
         conn.close()
@@ -36,23 +34,22 @@ def create_user():
 @app.route("/")
 @app.route("/login", methods=('GET', 'POST'))
 def login():
-    error = None
     if request.method=='GET':
         return render_template('login.html')
     if request.method=='POST':
         username = request.form['username']
         password = request.form['password']
         conn = psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
-        cur = conn.cursor
-        cur.execute("select password from users where user_pk=%s", (username))
-        rows = cur.fetchall()
+        cur = conn.cursor()
+        cur.execute("select password from users where user_pk=%s;", (username))
+        rows = cur.fetchone()
         for row in rows:
             if row:
                 if row == password:
-                    return render_template('dashboard.html', data='username')
+                    return render_template('dashboard.html')
             else:
                 error = 'Username and Password do not match.  Please try again.' 
-        conn.commit()
+        
         cur.close()
         conn.close()
     return render_template('login.html', error=error)
