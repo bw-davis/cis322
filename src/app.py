@@ -44,12 +44,10 @@ def login():
         cur.execute("select password from users where user_pk=%s;", (username))
         rows = cur.fetchone()
         for row in rows:
-            if row:
-                if row == password:
-                    return render_template('dashboard.html')
+            if row == password:
+                return render_template('dashboard.html')
             else:
-                error = 'Username and Password do not match.  Please try again.' 
-        
+                error = 'Username and Password do not match.  Please try again.'
         cur.close()
         conn.close()
     return render_template('login.html', error=error)
