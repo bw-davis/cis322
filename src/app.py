@@ -41,7 +41,8 @@ def login():
         password = request.form['password']
         conn = psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
         cur = conn.cursor()
-        cur.execute("select (count)* from users where user_pk=%s and password=%s;", (username, password))
+        cur.execute("select count(*) from users where user_pk=%s and password=%s;", (username, password))
+        #cur.execute("select (count)* from users where user_pk=%s and password=%s;", (username, password))
         rows = cur.fetchone()[0]
         if rows != 1:
             error = "Username and Password do not match. Please try again."
