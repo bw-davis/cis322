@@ -54,7 +54,7 @@ def login():
             cur.close()
             conn.close()
         else:
-            return render_template('dashboard.html')
+            return render_template('dashboard.html', username=username)
     return render_template('login.html', error=error)
 
 @app.route("/dashboard", methods=('GET', ))
