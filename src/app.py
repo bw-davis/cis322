@@ -68,10 +68,11 @@ def add_facility():
         conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
         cur = conn.cursor()
         cur.execute("insert into facilities (name, code) values (%s, %s);", (name, code))
-        error = "facility added successfully"
+        good = "facility added successfully"
         conn.commit()
         cur.close()
         conn.close()
+        return render_template('add_facility.html', good=good)
     return render_template('add_facility.html', error=error)
 
 @app.route("/add_asset", methods=('GET', 'POST'))
@@ -90,7 +91,7 @@ def add_asset():
         conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
         cur = conn.cursor()
         cur.execute("insert into assets (asset_tag, description) values (%s, %s);", (tag, description))
-        cur.execute("insert into asset_at (asset_fk, facility_fk, arrive_dt) select asset_pk, facility_pk from assets a, facilities f where a.asset_tag=%s and f.code=%s, %s;", (tag, facility_code, now()))
+        cur.execute("insert into asset_at (asset_fk, facility_fk) select asset_pk, facility_pk from assets a, facilities f where a.asset_tag=%s and f.code=%s;", (tag, facility_code))
         good = "asset added successfully"
         conn.commit()
         cur.close()
