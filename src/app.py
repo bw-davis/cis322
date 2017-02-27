@@ -6,6 +6,7 @@ import psycopg2
 from configure import dbname, dbhost, dbport
 
 app = Flask(__name__)
+app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 
 @app.route("/create_user", methods=('GET', 'POST'))
 def create_user():
@@ -47,6 +48,8 @@ def login():
             cur.close()
             conn.close()
         else:
+            session['username'] = username
+            session['password'] = password
             return render_template('dashboard.html', username=username)
     return render_template('login.html', error=error)
 
@@ -77,7 +80,7 @@ def add_asset():
     if request.method=='GET':
         conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
         cur = conn.cursor()
-        cur.execute("select code from facilities")
+        cur.execute("select code from facilities;")
         facilities = cur.fetchall()
         return render_template('add_asset.html', facilities=facilities)
     if request.method=='POST':
