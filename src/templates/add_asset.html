@@ -1,0 +1,28 @@
+<html>
+  <head>
+    <title>Add Asset</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  </head>
+  <body>
+    <div>
+      <h1>Please Add an Asset</h1>
+      <br>
+      <form action="{{url_for('add_asset')}}" method="POST">
+        <input type="TEXT" placeholder="Tag" name="tag">
+        <input type="TEXT" placeholder="Description" name="description">
+        <select name="facility_code">
+          {% for f in facilities %}
+	  <option name="facility_code">{{ f[0] }}</option>
+          {% endfor %}
+        </select>
+        <input class="btn btn-default" type="submit" value="Add">
+      </form>
+      {% if error %}
+        <p class="error"><strong>Error:</strong> {{ error }}
+      {% endif %}
+      {% if good %}
+        <p class="error"><strong>{{ good }}</strong> 
+      {% endif %}
+    </div>
+  </body>
+</html>

@@ -1,0 +1,23 @@
+<html>
+  <head>
+    <title>Add Facility</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  </head>
+  <body>
+    <div>
+      <h1>Please Add a Facility</h1>
+      <br>
+      <form action="{{url_for('add_facility')}}" method="POST">
+        <input type="TEXT" placeholder="Name" name="name">
+        <input type="TEXT" placeholder="Code" name="code">
+        <input class="btn btn-default" type="submit" value="Add">
+      </form>
+      {% if error %}
+        <p class="error"><strong>Error:</strong> {{ error }}
+      {% endif %}
+      {% if good %}
+     	<p><strong>{{ good }}</strong></p>
+	{% endif %}	
+    </div>
+  </body>
+</html>
