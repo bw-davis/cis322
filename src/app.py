@@ -110,9 +110,9 @@ def add_asset():
 @app.route("/dispose_asset", methods=('GET', 'POST'))
 def dispose_asset():
     error = None
-    if session['role'] != 'Logistics Officer':
-        error = 'only Logistics Officers can dispose of assets'
-        return render_template('dispose_asset.html', error=error)
+    # if session['role'] != 'Logistics Officer':
+    #     error = 'only Logistics Officers can dispose of assets'
+    #     return render_template('dispose_asset.html', error=error)
     if request.method=='GET':
         conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
         cur = conn.cursor()
