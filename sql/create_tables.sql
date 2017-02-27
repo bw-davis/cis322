@@ -30,6 +30,6 @@ create table facilities (
 create table asset_at (
     asset_fk    integer REFERENCES assets(asset_pk) not null,
     facility_fk integer REFERENCES facilities(facility_pk) not null,
-    arrive_dt   timestamp,
+    arrive_dt   timestamp default now(),
     depart_dt   timestamp
 );
