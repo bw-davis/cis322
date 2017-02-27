@@ -21,8 +21,10 @@ def create_user():
         cur = conn.cursor()
         if role == 'Facilities Officer':
             cur.execute("insert into users values (%s, %s, 2);", (username, password))
+            session['role'] = 'Facilities Officer'
         elif role == 'Logistics Officer':
             cur.execute("insert into users values (%s, %s, 1);", (username, password))
+            session['role'] = 'Logistics Officer'
         else:
             cur.execute("insert into users values (%s, %s);", (username, password))
         conn.commit()
@@ -90,14 +92,44 @@ def add_asset():
         facility_code = request.form['facility_code']
         conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
         cur = conn.cursor()
-        cur.execute("insert into assets (asset_tag, description) values (%s, %s);", (tag, description))
-        cur.execute("insert into asset_at (asset_fk, facility_fk) select asset_pk, facility_pk from assets a, facilities f where a.asset_tag=%s and f.code=%s;", (tag, facility_code))
-        good = "asset added successfully"
-        conn.commit()
+        cur.execute("select count(*) from assets where asset_tag=%s", (tag))
+        count = cur.fetchone()[0]
+        if count != 1:
+            cur.execute("insert into assets (asset_tag, description) values (%s, %s);", (tag, description))
+            cur.execute("insert into asset_at (asset_fk, facility_fk) select asset_pk, facility_pk from assets a, facilities f where a.asset_tag=%s and f.code=%s;", (tag, facility_code))
+            good = "asset added successfully"
+            conn.commit()
+        else:
+            error = "duplicate asset"
+            return render_template('add_asset.html', error=error)
         cur.close()
         conn.close()
         return render_template('add_asset.html', good=good)
     return render_template('add_asset.html', error=error)
+
+@app.route("/dispose_asset", methods=('GET', 'POST'))
+def dispose_asset():
+    error = None
+    if session['role'] != 'Logistics Officer':
+        error = 'only Logistics Officers can dispose of assets'
+        return render_template('dispose_asset.html', error=error)
+    if request.method=='GET':
+        conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
+        cur = conn.cursor()
+        cur.execute("select asset_tag from assets;")
+        assets = cur.fetchall()
+        return render_template('dispose_asset.html', assets=assets)
+    if request.method=='POST':
+        asset_tag = request.form['asset_tag']
+        conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
+        cur = conn.cursor()
+        cur.execute("delete from assets where asset_tag=%s", (asset_tag))
+        good = "asset deleted"
+        conn.commit()
+        cur.close()
+        conn.close()
+        return render_template('dispose_asset.html', good=good)
+    return render_template('dispose_asset.html', error=error)
  
 if __name__ == "__main__":
     app.run()

@@ -7,18 +7,19 @@
     <div>
       <h1>Please Dispose of an Asset</h1>
       <br>
-      <form action="{{url_for('add_asset')}}" method="POST">
-        <input type="TEXT" placeholder="Tag" name="tag">
-        <input type="TEXT" placeholder="Description" name="description">
+      <form action="{{url_for('dispose_asset')}}" method="POST">
+        <select name="asset_tag">
+          {% for a in assets %}
+            <option>{{ a[0] }}</option>
+          {% endfor %}
+        </select>
         <input class="btn btn-default" type="submit" value="Dispose">
       </form>
       {% if error %}
-        {{% if error == "asset added successfully"}
-          {<p class="error">{{ error }}}
-        {{% else %}}
-          {<p class="error"><strong>Error:</strong> {{ error }}}
-          {% endif %}
-        }
+        <p class="error"><strong>Error:</strong> {{ error }}
+      {% endif %}
+      {% if good %}
+        <p class="error"><strong>{{ good }}</strong> 
       {% endif %}
     </div>
   </body>
