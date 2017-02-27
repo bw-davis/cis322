@@ -10,7 +10,7 @@
       <form action="{{url_for('dispose_asset')}}" method="POST">
         <select name="asset_tag">
           {% for a in assets %}
-            <option>{{ a[0] }}</option>
+            <option name="asset_tag">{{ a[0] }}</option>
           {% endfor %}
         </select>
         <input class="btn btn-default" type="submit" value="Dispose">

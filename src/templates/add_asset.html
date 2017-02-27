@@ -12,7 +12,7 @@
         <input type="TEXT" placeholder="Description" name="description">
         <select name="facility_code">
           {% for f in facilities %}
-	  <option>{{ f[0] }}</option>
+	  <option name="facility_code">{{ f[0] }}</option>
           {% endfor %}
         </select>
         <input class="btn btn-default" type="submit" value="Add">
