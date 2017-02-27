@@ -1,0 +1,21 @@
+<html>
+  <head>
+    <title>Add Asset</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  </head>
+  <body>
+    <div>
+      <h1>Please Add an Asset</h1>
+      <br>
+      <form action="{{url_for('add_asset')}}" method="POST">
+        <input type="TEXT" placeholder="Tag" name="tag">
+        <input type="TEXT" placeholder="Description" name="description">
+        <input type="TEXT" placeholder="Disposed Of" name="disposed">
+        <input class="btn btn-default" type="submit" value="Add">
+      </form>
+      {% if error %}
+        <p class="error"><strong>Error:</strong> {{ error }}
+      {% endif %}
+    </div>
+  </body>
+</html>
