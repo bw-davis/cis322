@@ -89,10 +89,11 @@ def add_asset():
         conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
         cur = conn.cursor()
         cur.execute("insert into assets (asset_tag, description) values (%s, %s);", (tag, description))
-        error = "asset added successfully"
+        good = "asset added successfully"
         conn.commit()
         cur.close()
         conn.close()
+        return render_template('add_asset.html', good=good)
     return render_template('add_asset.html', error=error)
  
 if __name__ == "__main__":
