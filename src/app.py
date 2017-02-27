@@ -92,7 +92,7 @@ def add_asset():
         facility_code = request.form['facility_code']
         conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
         cur = conn.cursor()
-        cur.execute("select count(*) from assets where asset_tag=%s", (tag))
+        cur.execute("select count(*) from assets where asset_tag=%s;", (tag))
         count = cur.fetchone()[0]
         if count != 1:
             cur.execute("insert into assets (asset_tag, description) values (%s, %s);", (tag, description))
