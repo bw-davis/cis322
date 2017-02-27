@@ -75,7 +75,11 @@ def add_facility():
 def add_asset():
     error = None
     if request.method=='GET':
-        return render_template('add_asset.html')
+        conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
+        cur = conn.cursor()
+        cur.execute("select * from facilities")
+        facilities = cur.fetchall()
+        return render_template('add_asset.html', facilities=facilities)
     if request.method=='POST':
         tag = request.form['tag']
         description = request.form['description']

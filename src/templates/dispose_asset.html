@@ -1,0 +1,25 @@
+<html>
+  <head>
+    <title>Dispose Asset</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  </head>
+  <body>
+    <div>
+      <h1>Please Dispose of an Asset</h1>
+      <br>
+      <form action="{{url_for('add_asset')}}" method="POST">
+        <input type="TEXT" placeholder="Tag" name="tag">
+        <input type="TEXT" placeholder="Description" name="description">
+        <input class="btn btn-default" type="submit" value="Dispose">
+      </form>
+      {% if error %}
+        {{% if error == "asset added successfully"}
+          {<p class="error">{{ error }}}
+        {{% else %}}
+          {<p class="error"><strong>Error:</strong> {{ error }}}
+          {% endif %}
+        }
+      {% endif %}
+    </div>
+  </body>
+</html>
