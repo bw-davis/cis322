@@ -18,8 +18,10 @@ def create_user():
         role = request.form['role']
         conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
         cur = conn.cursor()
-        if role == 'Facilities Officer' or role == 'Logistics Officer':
-            cur.execute("insert into users values (%s, %s, %s);", (username, password, role))
+        if role == 'Facilities Officer':
+            cur.execute("insert into users values (%s, %s, 2);", (username, password))
+        elif role == 'Logistics Officer':
+            cur.execute("insert into users values (%s, %s, 1);", (username, password))
         else:
             cur.execute("insert into users values (%s, %s);", (username, password))
         conn.commit()

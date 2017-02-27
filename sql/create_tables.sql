@@ -4,7 +4,8 @@ create table roles (
 	role_pk			serial primary key,
 	role 			varchar(32)
 );
-
+insert into roles (role) values ('Logistics Officer');
+insert into roles (role) values('Facilities Officer');
 create table users (
     -- decided to have the username be the primary key to cut down on unnecessary fields
     user_pk         varchar(16) primary key,
