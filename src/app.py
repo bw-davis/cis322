@@ -121,7 +121,7 @@ def dispose_asset():
         conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
         cur = conn.cursor()
         cur.execute("delete from asset_at where asset_fk in (select asset_pk from assets where asset_tag=%s);", (asset_tag))
-        cur.execute("delete from assets where asset_tag=%s", (asset_tag))
+        cur.execute("delete from assets where asset_tag=%s;", (asset_tag))
         good = "asset deleted"
         conn.commit()
         cur.close()
