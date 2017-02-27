@@ -12,9 +12,8 @@
         <input type="TEXT" placeholder="Description" name="description">
         <select>
           {% for f in facilities %}
-	         <option name="tag">{{ f[0] }}</option>
+	         <option name="facility_code">{{ f[0] }}</option>
           {% endfor %}
-          <option name="test">TEST</option>
         </select>
         <input class="btn btn-default" type="submit" value="Add">
       </form>

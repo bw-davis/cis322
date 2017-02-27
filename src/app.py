@@ -86,10 +86,11 @@ def add_asset():
     if request.method=='POST':
         tag = request.form['tag']
         description = request.form['description']
-        facility_tag = request.form['tag']
+        facility_code = request.form['facility_code']
         conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
         cur = conn.cursor()
         cur.execute("insert into assets (asset_tag, description) values (%s, %s);", (tag, description))
+        cur.execute("insert into asset_at (asset_fk, facility_fk, arrive_dt) select asset_pk, facility_pk from assets a, facilities f where a.asset_tag=%s and f.code=%s, %s;", (tag, facility_code, now()))
         good = "asset added successfully"
         conn.commit()
         cur.close()
