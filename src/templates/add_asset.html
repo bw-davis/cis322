@@ -11,17 +11,16 @@
         <input type="TEXT" placeholder="Tag" name="tag">
         <input type="TEXT" placeholder="Description" name="description">
         <select>
-          {{% for f in facilities %}}
-            <option name={{f}}>{{ f }}</option>
-          {{% endfor %}}
-          }
+          {% for f in facilities %}
+	  <option name={{f}}>{{ f } }</option>
+          {% endfor %}
       </select>
         <input class="btn btn-default" type="submit" value="Add">
       </form>
       {% if error %}
         {% if error == "asset added successfully"}
           {<p class="error">{{ error }}
-        {{% else %}}
+        {% else %}
           <p class="error"><strong>Error:</strong> {{ error }}
         {% endif %}
       {% endif %}

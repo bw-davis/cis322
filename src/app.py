@@ -77,7 +77,7 @@ def add_asset():
     if request.method=='GET':
         conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
         cur = conn.cursor()
-        cur.execute("select * from facilities")
+        cur.execute("select code from facilities")
         facilities = cur.fetchall()
         return render_template('add_asset.html', facilities=facilities)
     if request.method=='POST':
