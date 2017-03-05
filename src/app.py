@@ -6,7 +6,7 @@ import psycopg2
 from configure import dbname, dbhost, dbport
 
 app = Flask(__name__)
-app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
+#app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 
 @app.route("/create_user", methods=('GET', 'POST'))
 def create_user():
@@ -21,10 +21,10 @@ def create_user():
         cur = conn.cursor()
         if role == 'Facilities Officer':
             cur.execute("insert into users values (%s, %s, 2);", (username, password))
-            session['role'] = 'Facilities Officer'
+ #           session['role'] = 'Facilities Officer'
         elif role == 'Logistics Officer':
             cur.execute("insert into users values (%s, %s, 1);", (username, password))
-            session['role'] = 'Logistics Officer'
+  #          session['role'] = 'Logistics Officer'
         else:
             cur.execute("insert into users values (%s, %s);", (username, password))
         conn.commit()
@@ -50,14 +50,14 @@ def login():
             cur.close()
             conn.close()
         else:
-            session['username'] = username
-            session['password'] = password
+   #         session['username'] = username
+    #        session['password'] = password
             return render_template('dashboard.html', username=username)
     return render_template('login.html', error=error)
 
 @app.route("/dashboard", methods=('GET', ))
 def dashboard():
-    return render_template('dashboard.html')
+    return render_template('dashboard.html', username='Brian')
 
 @app.route("/add_facility", methods=('GET', 'POST'))
 def add_facility():
@@ -131,4 +131,4 @@ def dispose_asset():
     return render_template('dispose_asset.html', error=error)
  
 if __name__ == "__main__":
-    app.run()
+    app.run(port=8080, host='0.0.0.0')
