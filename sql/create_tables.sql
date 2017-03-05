@@ -42,12 +42,12 @@ create table asset_at (
 -- table keeps data related to transferring an asset from one facility to another 
 create table transit_request (
 	request_pk					serial primary key,
-	requester					integer REFERENCES users(user_pk),		-- person who requested asset transfer
+	requester					varchar(16) REFERENCES users(user_pk),		-- person who requested asset transfer
 	create_dt					timestamp default now(),				-- timestamp of when request is created
 	asset_fk 					integer REFERENCES assets(asset_pk),	-- asset being transferred
 	source_facility_fk			integer REFERENCES facilities(facility_pk),	-- facility asset is leaving
 	destination_facility_fk		integer REFERENCES facilities(facility_pk), -- facility asset is going to
-	approved_by					integer REFERENCES users(user_pk),			-- approver of the request
+	approved_by					varchar(16) REFERENCES users(user_pk),			-- approver of the request
 	approved_dt					timestamp,									-- timestamp of when request approved
 	load_time					timestamp,								-- when the asset was loaded 
 	unload_time					timestamp								-- when the asset was unloaded
