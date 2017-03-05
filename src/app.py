@@ -16,6 +16,7 @@ def create_user():
     if request.method=='POST':
         username = request.form['username']
         password = request.form['password']
+        session['username'] = username
         role = request.form['role']
         conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
         cur = conn.cursor()
