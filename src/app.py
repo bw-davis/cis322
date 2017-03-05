@@ -92,7 +92,7 @@ def add_asset():
         facility_code = request.form['facility_code']
         conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
         cur = conn.cursor()
-        cur.execute("select count(*) from assets where asset_tag=%s;", (tag))
+        cur.execute("select count(*) from assets where asset_tag=(%s);", (tag, ))
         count = cur.fetchone()[0]
         if count != 1:
             cur.execute("insert into assets (asset_tag, description) values (%s, %s);", (tag, description))
@@ -131,7 +131,7 @@ def dispose_asset():
     return render_template('dispose_asset.html', error=error)
 
 @app.route("/transfer_req", methods=('GET', 'POST'))
-def add_facility():
+def transfer_req():
     error = None
     if request.method=='GET':
         conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
@@ -143,19 +143,24 @@ def add_facility():
         return render_template('transfer_req.html', assets=assets, facilities=facilities)
     if request.method=='POST':
         asset_tag = request.form['asset_tag']
-        destination_facility = request.form['source_facility']
+        facility_code = request.form['destination_facility']
         requester = session['username']
-        console.log(requster + asset_tag + destination_facility)
-        create_dt = now()
+        #create_dt = now()
         conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
-        # cur = conn.cursor()
-        # cur.execute("insert into facilities (name, code) values (%s, %s);", (name, code))
-        good = "facility added successfully"
-        # conn.commit()
-        # cur.close()
-        # conn.close()
-        return render_template('add_facility.html', good=good)
-    return render_template('add_facility.html', error=error)
+        cur = conn.cursor()
+        cur.execute("select asset_pk from assets where asset_tag=%s;", (asset_tag, ))
+        asset_fk = cur.fetchone()[0]
+        cur.execute("select facility_fk from asset_at where asset_fk=%s;", (asset_fk, ))
+        source_facility = cur.fetchone()[0]
+        cur.execute("select facility_pk from facilities where code=%s;", (facility_code, ))
+        destination_facility = cur.fetchone()[0]
+        cur.execute("insert into transit_request (requester, asset_fk, source_facility_fk, destination_facility_fk) values (%s, %s, %s, %s);", (requester, asset_fk, source_facility, destination_facility, ))
+        good = "transfer request created successfully"
+        conn.commit()
+        cur.close()
+        conn.close()
+        return render_template('transfer_req.html', good=good)
+    return render_template('transfer_req.html', error=error)
  
 if __name__ == "__main__":
-    app.run(port=8080, host='0.0.0.0')
+    app.run()

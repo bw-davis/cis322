@@ -8,14 +8,14 @@
       <h1>Please Submit Transfer Request</h1>
       <br>
       <form action="{{url_for('transfer_req')}}" method="POST">
-        <select name="asset_tag">
-        please select asset to transfer
+	      <p> please select an asset to tranfer </p>
+	<select name="asset_tag">
           {% for a in assets %}
             <option name="asset_tag">{{ a[0] }}</option>
           {% endfor %}
         </select>
+	<p> Please select desination facility </p>
         <select name="destination_facility">
-          please select facility to transfer asset to
           {% for f in facilities %}
            <option name="destination_facility">{{ f[0] }}</option>
           {% endfor %}
