@@ -41,8 +41,8 @@ div.tab a:focus, .active {
 	<a href="{{url_for('dispose_asset')}}" class="tablinks">Dispose Asset</a>
 	<a href="{{url_for('add_facility')}}" class="tablinks">Add Facility</a>
 	<a href="{{url_for('transfer_req')}}" class="tablinks">Transfer Request</a>
-	<a href="/asset_report" class="tablinks">Asset Report</a>
-	<a href="/transfer_report" class="tablinks">Transfer Report</a>
+	<a href="{{url_for('asset_report')}}" class="tablinks">Asset Report</a>
+	<a href="{{url_for('transfer_report')}}" class="tablinks">Transfer Report</a>
 </div><br/>
 	hello {{ username }}!!
 </body>

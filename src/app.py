@@ -130,6 +130,14 @@ def dispose_asset():
         return render_template('dispose_asset.html', good=good)
     return render_template('dispose_asset.html', error=error)
 
+@app.route("/asset_report", methods=('GET', 'POST'))
+def asset_report():
+    return render_template('asset_report.html')
+
+@app.route("/transfer_report", methods=('GET', 'POST'))
+def transfer_report():
+    return render_template('transfer_report.html')
+
 @app.route("/transfer_req", methods=('GET', 'POST'))
 def transfer_req():
     error = None
@@ -137,10 +145,11 @@ def transfer_req():
         conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
         cur = conn.cursor()
         cur.execute("select asset_tag from assets;")
-        assets = cur.fetchall()
+        
+        session['assets'] = cur.fetchall()
         cur.execute("select code from facilities;")
-        facilities = cur.fetchall()
-        return render_template('transfer_req.html', assets=assets, facilities=facilities)
+        session['facilities'] = cur.fetchall()
+        return render_template('transfer_req.html', assets=session['assets'], facilities=session['facilities'])
     if request.method=='POST':
         asset_tag = request.form['asset_tag']
         facility_code = request.form['destination_facility']
@@ -149,11 +158,11 @@ def transfer_req():
         cur = conn.cursor()
         cur.execute("select asset_pk from assets where asset_tag=%s;", (asset_tag, ))
         asset_fk = cur.fetchone()[0]
-        cur.execute("select facility_fk from asset_at where asset_fk=%s;", (asset_fk, ))
+        cur.execute("select facility_pk from facilities where code=%s;", (facility_code, ))
         source_facility = cur.fetchone()[0]
         cur.execute("select count(*) from asset_at where asset_fk=%s and facility_fk=%s;", (asset_fk, source_facility, ))
         count = cur.fetchone()[0]
-        if count != 1:
+        if count == 0:
             cur.execute("select facility_pk from facilities where code=%s;", (facility_code, ))
             destination_facility = cur.fetchone()[0]
             cur.execute("insert into transit_request (requester, asset_fk, source_facility_fk, destination_facility_fk) values (%s, %s, %s, %s);", (requester, asset_fk, source_facility, destination_facility, ))
@@ -161,10 +170,10 @@ def transfer_req():
             conn.commit()
             cur.close()
             conn.close()
-            return render_template('transfer_req.html', good=good)
+            return render_template('transfer_req.html', good=good, assets=session['assets'], facilities=session['facilities'])
         else:
             error = "that asset is already at that facility.  Try again."
-            return redirect('transfer_req.html', error=error)
+            return render_template('transfer_req.html', error=error, assets=session['assets'], facilities=session['facilities'])
     return render_template('transfer_req.html', error=error)
  
 if __name__ == "__main__":
