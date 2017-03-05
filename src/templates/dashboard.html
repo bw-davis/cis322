@@ -1,10 +1,5 @@
 <html>
-<body>
-<!--
-<html>
-<head>
 <style>
-body {font-family: "Lato", sans-serif;}
 
 /* Style the tab */
 div.tab {
@@ -40,17 +35,15 @@ div.tab a:focus, .active {
     border-top: none;
 }
 </style>
-</head>
 <body>
 <div class="tab">
-	  <a href="javascript:void(0)" class="tablinks" onclick="{{ url_for('add_asset') }}">Add Asset</a></li>	
-	  <a href="javascript:void(0)" class="tablinks" onclick="{{ url_for('dispose_asset') }}">Dispose Asset</a></li>
-	  <a href="javascript:void(0)" class="tablinks" onclick="{{ url_for('add_facility') }}"> Add Facility</a></li>
-	  <a href="javascript:void(0)" class="tablinks" onclick="{{ url_for('transfer_request') }}">Transfer Request</a></li>
-	  <a href="javascript:void(0)" class="tablinks" onclick="{{ url_for('asset_report') }}">Asset Report</a></li>
-	  <a href="javascript:void(0)" class="tablinks" onclick="{{ url_for('transfer_report') }}">Transfer Report</a></li>
+	<a href="{{url_for('add_asset')}}" class="tablinks">add asset</a>	
+	<a href="{{url_for('dispose_asset')}}" class="tablinks">dispose asset</a>
+	<a href="{{url_for('add_facility')}}" class="tablinks"> Add Facility</a>
+	<a href="javasript:void(0)" class="tablinks">Transfer Request</a>
+	  <a href="javascript:void(0)" class="tablinks">Asset Report</a>
+	  <a href="javascript:void(0)" class="tablinks">Transfer Report</a>
 	</div><br/>
-	-->
-hello!!
+	hello {{ username }}!!
 </body>
 </html> 
