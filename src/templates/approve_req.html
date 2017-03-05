@@ -9,17 +9,16 @@
       <br>
       <p>Here's a list of requests and their information: </p>
       {% for t in transfer_requests %}
-          {% for t in transfer_requests %}
-            <h3>{{ t }}</h3>
-       		{% endfor %}  
+            <h3>{{ t }}</h3>  
        {% endfor %}
-      <form action="{{url_for('transfer_req')}}" method="POST">
+      <form action="{{url_for('approve_req')}}" method="POST">
 	<select name="transfer_request">
           {% for r in request_pk %}
             <option name="transfer_request">{{ r[0] }}</option>
           {% endfor %}
         </select>
-        <input class="btn btn-default" type="submit" value="Submit">
+        <input class="btn btn-default" name="option" type="submit" value="Approve">
+      	<input class="btn btn-default" name="option" type="submit" value="Reject">
       </form>
       {% if error %}
         <p class="error"><strong>Error:</strong> {{ error }}

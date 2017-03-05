@@ -54,10 +54,3 @@ create table transit_request (
 	unload_time					timestamp								-- when the asset was unloaded
 	
 );
--- once a transit request is approved an in_transit record is created to track the asset
--- create table in_transit (
--- 	source_facility_fk			integer REFERENCES facilities(facility_pk),
--- 	destination_facility_fk		integer REFERENCES facilities(facility_pk),
--- 	load_time					timestamp,
--- 	unload_time					timestamp
--- );
