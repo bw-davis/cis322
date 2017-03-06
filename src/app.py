@@ -158,7 +158,7 @@ def transfer_req():
         asset_tag = request.form['asset_tag']
         facility_code = request.form['destination_facility']
         requester = session['username']
-        # summary = request.form['summary']
+        summary = request.form['summary']
         # conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
         # cur = conn.cursor()
         cur.execute("select asset_pk from assets where asset_tag=%s;", (asset_tag, ))
@@ -170,7 +170,7 @@ def transfer_req():
         if count == 0:
             cur.execute("select facility_pk from facilities where code=%s;", (facility_code, ))
             destination_facility = cur.fetchone()[0]
-            cur.execute("insert into transit_request (requester, asset_fk, source_facility_fk, destination_facility_fk) values (%s, %s, %s, %s);", (requester, asset_fk, source_facility, destination_facility, ))
+            cur.execute("insert into transit_request (requester, asset_fk, source_facility_fk, destination_facility_fk, summary) values (%s, %s, %s, %s);", (requester, asset_fk, source_facility, destination_facility, summary, ))
             good = "transfer request created successfully"
             conn.commit()
             cur.close()
@@ -192,11 +192,14 @@ def approve_req():
         error = "only Logistics Officers can approve transfers"
         return render_template('error.html', error=error)
     if request.method=='GET':
-        cur.execute("select request pk from transit_request;")
+        cur.execute("select request_pk from transit_request;")
+        request_pk = cur.fetchall()
+        cur.execute("select * from transit_request;")
         transfer_requests = cur.fetchall()
-        return render_template('approve_req.html', transfer_requests=transfer_requests)
+        return render_template('approve_req.html', transfer_requests=transfer_requests, request_pk=request_pk)
     if request.method=='POST':
-        good = "good"
+        request_pk = request.form['transfer_request']
+        good = "transfer request approved"
         return render_template('approve_req.html', good=good)
 if __name__ == "__main__":
     app.run()

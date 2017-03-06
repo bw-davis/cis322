@@ -42,6 +42,7 @@ create table asset_at (
 -- table keeps data related to transferring an asset from one facility to another 
 create table transit_request (
 	request_pk					serial primary key,
+	summary						varchar(16),
 	requester					varchar(16) REFERENCES users(user_pk),		-- person who requested asset transfer
 	create_dt					timestamp default now(),				-- timestamp of when request is created
 	asset_fk 					integer REFERENCES assets(asset_pk),	-- asset being transferred
