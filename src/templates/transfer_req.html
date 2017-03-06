@@ -8,6 +8,8 @@
       <h1>Please Submit Transfer Request</h1>
       <br>
       <form action="{{url_for('transfer_req')}}" method="POST">
+        <p> Please input a name for request up to 16 characters </p>
+        <input type="TEXT" placeholder="Name" name="summary">
 	      <p> Please select an asset to tranfer </p>
 	<select name="asset_tag">
           {% for a in assets %}
