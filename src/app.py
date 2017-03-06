@@ -16,6 +16,7 @@ def create_user():
     if request.method=='POST':
         username = request.form['username']
         password = request.form['password']
+        session['username'] = username
         role = request.form['role']
         conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
         cur = conn.cursor()
@@ -57,7 +58,7 @@ def login():
 
 @app.route("/dashboard", methods=('GET', ))
 def dashboard():
-    return render_template('dashboard.html')
+    return render_template('dashboard.html', username='Brian')
 
 @app.route("/add_facility", methods=('GET', 'POST'))
 def add_facility():
@@ -80,11 +81,15 @@ def add_facility():
 @app.route("/add_asset", methods=('GET', 'POST'))
 def add_asset():
     error = None
+    conn = psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
+    cur = conn.cursor()
+    cur.execute("select code from facilities;")
+    facilities = cur.fetchall()
     if request.method=='GET':
-        conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
-        cur = conn.cursor()
-        cur.execute("select code from facilities;")
-        facilities = cur.fetchall()
+        #conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
+        #cur = conn.cursor()
+        #cur.execute("select code from facilities;")
+        #facilities = cur.fetchall()
         return render_template('add_asset.html', facilities=facilities)
     if request.method=='POST':
         tag = request.form['tag']
@@ -92,19 +97,19 @@ def add_asset():
         facility_code = request.form['facility_code']
         conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
         cur = conn.cursor()
-        # cur.execute("select count(*) from assets where asset_tag=%s;", (tag))
-        # count = cur.fetchone()[0]
-        # if count != 1:
-        cur.execute("insert into assets (asset_tag, description) values (%s, %s);", (tag, description))
-        cur.execute("insert into asset_at (asset_fk, facility_fk) select asset_pk, facility_pk from assets a, facilities f where a.asset_tag=%s and f.code=%s;", (tag, facility_code))
-        good = "asset added successfully"
-        conn.commit()
-        # else:
-        #     error = "duplicate asset"
-        #     return render_template('add_asset.html', error=error)
+        cur.execute("select count(*) from assets where asset_tag=(%s);", (tag, ))
+        count = cur.fetchone()[0]
+        if count != 1:
+            cur.execute("insert into assets (asset_tag, description) values (%s, %s);", (tag, description))
+            cur.execute("insert into asset_at (asset_fk, facility_fk) select asset_pk, facility_pk from assets a, facilities f where a.asset_tag=%s and f.code=%s;", (tag, facility_code))
+            good = "asset added successfully"
+            conn.commit()
+        else:
+            error = "duplicate asset"
+            return render_template('add_asset.html', error=error)
         cur.close()
         conn.close()
-        return render_template('add_asset.html', good=good)
+        return render_template('add_asset.html', good=good, facilities=facilities)
     return render_template('add_asset.html', error=error)
 
 @app.route("/dispose_asset", methods=('GET', 'POST'))
@@ -129,6 +134,89 @@ def dispose_asset():
         conn.close()
         return render_template('dispose_asset.html', good=good)
     return render_template('dispose_asset.html', error=error)
- 
+
+@app.route("/asset_report", methods=('GET', 'POST'))
+def asset_report():
+    return render_template('asset_report.html')
+
+@app.route("/transfer_report", methods=('GET', 'POST'))
+def transfer_report():
+    return render_template('transfer_report.html')
+
+@app.route("/transfer_req", methods=('GET', 'POST'))
+def transfer_req():
+    error = None
+    conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
+    cur = conn.cursor()
+    cur.execute("select role_fk from users where user_pk=%s;", (session['username'], ))
+    role_fk = cur.fetchone()[0]
+    if role_fk != 1:
+        error = "only Logistics Officers can request transfers"
+        return render_template('error.html', error=error)
+    if request.method=='GET':
+        cur.execute("select asset_tag from assets;")
+        session['assets'] = cur.fetchall()
+        cur.execute("select code from facilities;")
+        session['facilities'] = cur.fetchall()
+        return render_template('transfer_req.html', assets=session['assets'], facilities=session['facilities'])
+    if request.method=='POST':
+        asset_tag = request.form['asset_tag']
+        facility_code = request.form['destination_facility']
+        requester = session['username']
+        summary = request.form['summary']
+        # conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
+        # cur = conn.cursor()
+        cur.execute("select asset_pk from assets where asset_tag=%s;", (asset_tag, ))
+        asset_fk = cur.fetchone()[0]
+        cur.execute("select facility_pk from facilities where code=%s;", (facility_code, ))
+        source_facility = cur.fetchone()[0]
+        cur.execute("select count(*) from asset_at where asset_fk=%s and facility_fk=%s;", (asset_fk, source_facility, ))
+        count = cur.fetchone()[0]
+        if count == 0:
+            cur.execute("select facility_pk from facilities where code=%s;", (facility_code, ))
+            destination_facility = cur.fetchone()[0]
+            cur.execute("insert into transit_request (requester, asset_fk, source_facility_fk, destination_facility_fk, summary) values (%s, %s, %s, %s, %s);", (requester, asset_fk, source_facility, destination_facility, summary, ))
+            good = "transfer request created successfully"
+            conn.commit()
+            cur.close()
+            conn.close()
+            return render_template('transfer_req.html', good=good, assets=session['assets'], facilities=session['facilities'])
+        else:
+            error = "that asset is already at that facility.  Try again."
+            return render_template('transfer_req.html', error=error, assets=session['assets'], facilities=session['facilities'])
+    return render_template('transfer_req.html', error=error)
+
+@app.route("/approve_req", methods=('GET', 'POST'))
+def approve_req():
+    error = None
+    conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
+    cur = conn.cursor()
+    cur.execute("select role_fk from users where user_pk=%s;", (session['username'], ))
+    role_fk = cur.fetchone()[0]
+    if role_fk != 1:
+        error = "only Logistics Officers can approve transfers"
+        return render_template('error.html', error=error)
+    if request.method=='GET':
+        cur.execute("select request_pk from transit_request where approved_by is NULL;")
+        request_pk = cur.fetchall()
+        cur.execute("select * from transit_request where approved_by is NULL;")
+        transfer_requests = cur.fetchall()
+        return render_template('approve_req.html', transfer_requests=transfer_requests, request_pk=request_pk)
+    if request.method=='POST':
+        request_pk = request.form['transfer_request']
+        if request.form['option'] == 'Reject':
+            cur.execute("delete from transit_request where request_pk=%s;", (request_pk, ))
+            conn.commit()
+            error = "You rejected the request and it was deleted"
+            return render_template('dashboard.html', error=error)
+        if request.form['option'] == 'Approve':
+            #request_pk = request.form['transfer_request']
+            cur.execute("update transit_request set approved_by=%s, approved_dt=now() where request_pk=%s;", (session['username'], request_pk, ))
+        #cur.execute("update transit_request set approved_by=%s, approved_dt=now where request_pk=%s;", (session['username'],  request_pk, ))
+            error = "transfer request approved"
+            conn.commit()
+            cur.close()
+            conn.close()
+            return render_template('dashboard.html', error=error)
 if __name__ == "__main__":
     app.run()

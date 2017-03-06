@@ -1,0 +1,31 @@
+<html>
+  <head>
+    <title>Transfer Request</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  </head>
+  <body>
+    <div>
+      <h1>Please Select Request To Approve</h1>
+      <br>
+      <p>Here's a list of requests and their information: </p>
+      {% for t in transfer_requests %}
+            <h3>{{ t }}</h3>  
+       {% endfor %}
+      <form action="{{url_for('approve_req')}}" method="POST">
+	<select name="transfer_request">
+          {% for r in request_pk %}
+            <option name="transfer_request">{{ r[0] }}</option>
+          {% endfor %}
+        </select>
+        <input class="btn btn-default" name="option" type="submit" value="Approve">
+      	<input class="btn btn-default" name="option" type="submit" value="Reject">
+      </form>
+      {% if error %}
+        <p class="error"><strong>Error:</strong> {{ error }}
+      {% endif %}
+      {% if good %}
+        <p class="error"><strong>{{ good }}</strong> 
+      {% endif %}
+    </div>
+  </body>
+</html>
