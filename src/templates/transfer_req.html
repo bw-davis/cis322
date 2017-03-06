@@ -1,0 +1,33 @@
+<html>
+  <head>
+    <title>Transfer Request</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  </head>
+  <body>
+    <div>
+      <h1>Please Submit Transfer Request</h1>
+      <br>
+      <form action="{{url_for('transfer_req')}}" method="POST">
+        <select name="asset_tag">
+        please select asset to transfer
+          {% for a in assets %}
+            <option name="asset_tag">{{ a[0] }}</option>
+          {% endfor %}
+        </select>
+        <select name="destination_facility">
+          please select facility to transfer asset to
+          {% for f in facilities %}
+           <option name="destination_facility">{{ f[0] }}</option>
+          {% endfor %}
+        </select>
+        <input class="btn btn-default" type="submit" value="Submit">
+      </form>
+      {% if error %}
+        <p class="error"><strong>Error:</strong> {{ error }}
+      {% endif %}
+      {% if good %}
+        <p class="error"><strong>{{ good }}</strong> 
+      {% endif %}
+    </div>
+  </body>
+</html>

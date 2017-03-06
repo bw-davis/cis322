@@ -6,7 +6,7 @@ import psycopg2
 from configure import dbname, dbhost, dbport
 
 app = Flask(__name__)
-#app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
+app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 
 @app.route("/create_user", methods=('GET', 'POST'))
 def create_user():
@@ -21,10 +21,10 @@ def create_user():
         cur = conn.cursor()
         if role == 'Facilities Officer':
             cur.execute("insert into users values (%s, %s, 2);", (username, password))
- #           session['role'] = 'Facilities Officer'
+            session['role'] = 'Facilities Officer'
         elif role == 'Logistics Officer':
             cur.execute("insert into users values (%s, %s, 1);", (username, password))
-  #          session['role'] = 'Logistics Officer'
+            session['role'] = 'Logistics Officer'
         else:
             cur.execute("insert into users values (%s, %s);", (username, password))
         conn.commit()
@@ -50,8 +50,8 @@ def login():
             cur.close()
             conn.close()
         else:
-   #         session['username'] = username
-    #        session['password'] = password
+            session['username'] = username
+            session['password'] = password
             return render_template('dashboard.html', username=username)
     return render_template('login.html', error=error)
 
@@ -92,16 +92,16 @@ def add_asset():
         facility_code = request.form['facility_code']
         conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
         cur = conn.cursor()
-        # cur.execute("select count(*) from assets where asset_tag=%s;", (tag))
-        # count = cur.fetchone()[0]
-        # if count != 1:
-        cur.execute("insert into assets (asset_tag, description) values (%s, %s);", (tag, description))
-        cur.execute("insert into asset_at (asset_fk, facility_fk) select asset_pk, facility_pk from assets a, facilities f where a.asset_tag=%s and f.code=%s;", (tag, facility_code))
-        good = "asset added successfully"
-        conn.commit()
-        # else:
-        #     error = "duplicate asset"
-        #     return render_template('add_asset.html', error=error)
+        cur.execute("select count(*) from assets where asset_tag=%s;", (tag))
+        count = cur.fetchone()[0]
+        if count != 1:
+            cur.execute("insert into assets (asset_tag, description) values (%s, %s);", (tag, description))
+            cur.execute("insert into asset_at (asset_fk, facility_fk) select asset_pk, facility_pk from assets a, facilities f where a.asset_tag=%s and f.code=%s;", (tag, facility_code))
+            good = "asset added successfully"
+            conn.commit()
+        else:
+            error = "duplicate asset"
+            return render_template('add_asset.html', error=error)
         cur.close()
         conn.close()
         return render_template('add_asset.html', good=good)
@@ -129,6 +129,33 @@ def dispose_asset():
         conn.close()
         return render_template('dispose_asset.html', good=good)
     return render_template('dispose_asset.html', error=error)
+
+@app.route("/transfer_req", methods=('GET', 'POST'))
+def add_facility():
+    error = None
+    if request.method=='GET':
+        conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
+        cur = conn.cursor()
+        cur.execute("select asset_tag from assets;")
+        assets = cur.fetchall()
+        cur.execute("select code from facilities;")
+        facilities = cur.fetchall()
+        return render_template('transfer_req.html', assets=assets, facilities=facilities)
+    if request.method=='POST':
+        asset_tag = request.form['asset_tag']
+        destination_facility = request.form['source_facility']
+        requester = session['username']
+        console.log(requster + asset_tag + destination_facility)
+        create_dt = now()
+        conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
+        # cur = conn.cursor()
+        # cur.execute("insert into facilities (name, code) values (%s, %s);", (name, code))
+        good = "facility added successfully"
+        # conn.commit()
+        # cur.close()
+        # conn.close()
+        return render_template('add_facility.html', good=good)
+    return render_template('add_facility.html', error=error)
  
 if __name__ == "__main__":
     app.run(port=8080, host='0.0.0.0')

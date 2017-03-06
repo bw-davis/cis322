@@ -4,7 +4,7 @@
 /* Style the tab */
 div.tab {
     overflow: hidden;
-    border: 1px solid #ccc;
+    border: 1px solid #fff;
     background-color: #f1f1f1;
 }
 
@@ -37,13 +37,13 @@ div.tab a:focus, .active {
 </style>
 <body>
 <div class="tab">
-	<a href="{{url_for('add_asset')}}" class="tablinks">add asset</a>	
-	<a href="{{url_for('dispose_asset')}}" class="tablinks">dispose asset</a>
+	<a href="{{url_for('add_asset')}}" class="tablinks">Add Asset</a>	
+	<a href="{{url_for('dispose_asset')}}" class="tablinks">Dispose Asset</a>
 	<a href="{{url_for('add_facility')}}" class="tablinks"> Add Facility</a>
-	<a href="javasript:void(0)" class="tablinks">Transfer Request</a>
-	  <a href="javascript:void(0)" class="tablinks">Asset Report</a>
-	  <a href="javascript:void(0)" class="tablinks">Transfer Report</a>
-	</div><br/>
+	<a href="{{url_for('transfer_request')}}" class="tablinks">Transfer Request</a>
+	<a href="{{url_for('asset_report')}}" class="tablinks">Asset Report</a>
+	<a href="{{url_for('tranfer_req')}}" class="tablinks">Transfer Report</a>
+</div><br/>
 	hello {{ username }}!!
 </body>
 </html> 
