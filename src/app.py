@@ -145,21 +145,26 @@ def transfer_req():
         asset_tag = request.form['asset_tag']
         facility_code = request.form['destination_facility']
         requester = session['username']
-        #create_dt = now()
         conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
         cur = conn.cursor()
         cur.execute("select asset_pk from assets where asset_tag=%s;", (asset_tag, ))
         asset_fk = cur.fetchone()[0]
         cur.execute("select facility_fk from asset_at where asset_fk=%s;", (asset_fk, ))
         source_facility = cur.fetchone()[0]
-        cur.execute("select facility_pk from facilities where code=%s;", (facility_code, ))
-        destination_facility = cur.fetchone()[0]
-        cur.execute("insert into transit_request (requester, asset_fk, source_facility_fk, destination_facility_fk) values (%s, %s, %s, %s);", (requester, asset_fk, source_facility, destination_facility, ))
-        good = "transfer request created successfully"
-        conn.commit()
-        cur.close()
-        conn.close()
-        return render_template('transfer_req.html', good=good)
+        cur.execute("select count(*) from asset_at where asset_fk=%s and facility_fk=%s;", (asset_fk, source_facility, ))
+        count = cur.fetchone()[0]
+        if count != 1:
+            cur.execute("select facility_pk from facilities where code=%s;", (facility_code, ))
+            destination_facility = cur.fetchone()[0]
+            cur.execute("insert into transit_request (requester, asset_fk, source_facility_fk, destination_facility_fk) values (%s, %s, %s, %s);", (requester, asset_fk, source_facility, destination_facility, ))
+            good = "transfer request created successfully"
+            conn.commit()
+            cur.close()
+            conn.close()
+            return render_template('transfer_req.html', good=good)
+        else:
+            error = "that asset is already at that facility.  Try again."
+            return redirect('transfer_req.html', error=error)
     return render_template('transfer_req.html', error=error)
  
 if __name__ == "__main__":
