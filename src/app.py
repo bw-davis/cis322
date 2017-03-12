@@ -167,9 +167,9 @@ def transfer_req():
         cur.execute("select count(*) from asset_at where asset_fk=%s and facility_fk=%s;", (asset_fk, destination_facility, ))
         count = cur.fetchone()[0]
         if count == 0:
-            cur.execute("select transfer_fk from asset_at where asset_fk=%s;", (asset_fk, ))
+            cur.execute("select facility_fk from asset_at where asset_fk=%s;", (asset_fk, ))
             source_facility = cur.fetchone()[0]
-            cur.execute("insert into transit_request (requester, asset_fk, source_facility_fk, destination_facility_fk, summary) values (%s, %s, %s, %s);", (requester, asset_fk, source_facility, destination_facility, summary, ))
+            cur.execute("insert into transit_request (requester, asset_fk, source_facility_fk, destination_facility_fk, summary) values (%s, %s, %s, %s, %s);", (requester, asset_fk, source_facility, destination_facility, summary, ))
             good = "transfer request created successfully"
             conn.commit()
             cur.close()
