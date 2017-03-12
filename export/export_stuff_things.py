@@ -78,7 +78,7 @@ def exportTransfers():
 	    writer.writeheader()
 	    
 	    for r in row:
-	    	cur.execute("select asset_tag from assets where asset_pk=%s;", (r[4]))
+	    	cur.execute("select asset_tag from assets where asset_pk=%s;", (r[4], ))
 	    	asset_tag = cur.fetchone()[0]
 	    	request_by = r[2]
 	    	request_dt = r[3]
@@ -96,9 +96,9 @@ def exportTransfers():
 	    		approve_dt = r[8]
 	    		load_dt = r[9]
 	    		unload_dt = r[10]
-	    	cur.execute("select code from facilities where facility_pk=%s;", (r[6], ))
+	    	cur.execute("select code from facilities where facility_pk=%s;", (r[5], ))
 	    	source = cur.fetchone()[0]
-	    	cur.execute("select code from facilities where facility_pk=%s;", (r[7], ))
+	    	cur.execute("select code from facilities where facility_pk=%s;", (r[6], ))
 	    	destination = cur.fetchone()[0]
 	    	writer.writerow({'asset_tag': asset_tag, 'request_by': request_by, 'request_dt': request_dt, 'approve_by': approve_by, 'approve_dt': approve_dt, 'source': source, 'destination': destination, 'load_dt': load_dt, 'unload_dt': unload_dt})
 
