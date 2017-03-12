@@ -22,9 +22,14 @@ def exportUsers():
 	    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
 	    writer.writeheader()
+	    role = ''
 	    for r in row:
-	    	writer.writerow({'username': r[0], 'password': r[1], 'role': r[2], 'active': 'True'})
-	    	
+	    	if r[2] == 1:
+	    		role = 'Logistics Officer'
+	    	else:
+	    		role = 'Facilities Officer'
+	    	writer.writerow({'username': r[0], 'password': r[1], 'role': role, 'active': 'TRUE'})
+
 def main():
     exportUsers()
     # with open('inv_load.sql','w') as f:
