@@ -54,12 +54,12 @@ def exportAssets():
 	    disposed = ''
 	    asset_at = []
 	    for r in row:
-	    	if r[3] == TRUE:
-				cur.execute("select arrive_dt, depart_dt, facility_fk from asset_at where asset_fk=%s;", (r[0], ))
-				asset_at = cur.fetchall()
+	    	if r[3] == 'TRUE':
+	    		cur.execute("select arrive_dt, depart_dt, facility_fk from asset_at where asset_fk=%s;", (r[0]))
+	    		asset_at = cur.fetchall()
 				disposed = asset_at[3]
 			else:
-				cur.execute("select arrive_dt, facility_fk from asset_at where asset_fk=%s;", (r[0], ))
+				cur.execute("select arrive_dt, facility_fk from asset_at where asset_fk=%s;", (r[0]))
 				asset_at = cur.fetchall()
 				disposed = 'NULL'
 			cur.execute("select name from facilities where facility_pk=%s;", (asset_at[1]))
