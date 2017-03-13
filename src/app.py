@@ -180,6 +180,7 @@ def transfer_req():
 
 @app.route("/approve_req", methods=('GET', 'POST'))
 def approve_req():
+    def approve_req():
     error = None
     conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
     cur = conn.cursor()
@@ -189,14 +190,24 @@ def approve_req():
         error = "only Logistics Officers can approve transfers"
         return render_template('error.html', error=error)
     if request.method=='GET':
-        cur.execute("select request_pk from transit_request;")
+        cur.execute("select request_pk from transit_request where approved_by is NULL;")
         request_pk = cur.fetchall()
-        cur.execute("select * from transit_request;")
+        cur.execute("select * from transit_request where approved_by is NULL;")
         transfer_requests = cur.fetchall()
         return render_template('approve_req.html', transfer_requests=transfer_requests, request_pk=request_pk)
     if request.method=='POST':
         request_pk = request.form['transfer_request']
-        good = "transfer request approved"
-        return render_template('approve_req.html', good=good)
+        if request.form['option'] == 'Reject':
+            cur.execute("delete from transit_request where request_pk=%s;", (request_pk, ))
+            conn.commit()
+            error = "You rejected the request and it was deleted"
+            return render_template('dashboard.html', error=error)
+        if request.form['option'] == 'Approve':
+            cur.execute("update transit_request set approved_by=%s, approved_dt=now() where request_pk=%s;", (session['username'], request_pk, ))
+            error = "transfer request approved"
+            conn.commit()
+            cur.close()
+            conn.close()
+            return render_template('dashboard.html', error=error)
 if __name__ == "__main__":
     app.run()
