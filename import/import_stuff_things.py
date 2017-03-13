@@ -32,7 +32,7 @@ def importFacilities():
 	with open(fullname) as csvfile:
 	    reader = csv.DictReader(csvfile)
 	    for row in reader:
-	    	cur.execute("insert into facilities (name, code) values (%s, %s);", (row['fcode'], row['common_name'], ))
+	    	cur.execute("insert into facilities (code, name) values (%s, %s);", (row['fcode'], row['common_name'], ))
 	    	conn.commit()
 
 def importAssets():
