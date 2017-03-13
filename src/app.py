@@ -126,8 +126,6 @@ def dispose_asset():
         conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
         cur = conn.cursor()
         cur.execute("insert into asset_at (depart_dt) values (%s) select asset_pk, facility_pk from assets a, facilities f where a.asset_tag=%s and f.code=%s;", (now(), tag, facility_code))
-        # cur.execute("delete from asset_at where asset_fk in (select asset_pk from assets where asset_tag=%s);", (asset_tag))
-        # cur.execute("delete from assets where asset_tag=%s;", (asset_tag))
         good = "asset disposed"
         conn.commit()
         cur.close()
@@ -164,17 +162,15 @@ def transfer_req():
         facility_code = request.form['destination_facility']
         requester = session['username']
         summary = request.form['summary']
-        # conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
-        # cur = conn.cursor()
         cur.execute("select asset_pk from assets where asset_tag=%s;", (asset_tag, ))
         asset_fk = cur.fetchone()[0]
         cur.execute("select facility_pk from facilities where code=%s;", (facility_code, ))
-        source_facility = cur.fetchone()[0]
-        cur.execute("select count(*) from asset_at where asset_fk=%s and facility_fk=%s;", (asset_fk, source_facility, ))
+        destination_facility = cur.fetchone()[0]
+        cur.execute("select count(*) from asset_at where asset_fk=%s and facility_fk=%s;", (asset_fk, destination_facility, ))
         count = cur.fetchone()[0]
         if count == 0:
-            cur.execute("select facility_pk from facilities where code=%s;", (facility_code, ))
-            destination_facility = cur.fetchone()[0]
+            cur.execute("select facility_fk from asset_at where asset_fk=%s;", (asset_fk, ))
+            source_facility = cur.fetchone()[0]
             cur.execute("insert into transit_request (requester, asset_fk, source_facility_fk, destination_facility_fk, summary) values (%s, %s, %s, %s, %s);", (requester, asset_fk, source_facility, destination_facility, summary, ))
             good = "transfer request created successfully"
             conn.commit()
@@ -188,6 +184,7 @@ def transfer_req():
 
 @app.route("/approve_req", methods=('GET', 'POST'))
 def approve_req():
+    def approve_req():
     error = None
     conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
     cur = conn.cursor()
@@ -210,9 +207,7 @@ def approve_req():
             error = "You rejected the request and it was deleted"
             return render_template('dashboard.html', error=error)
         if request.form['option'] == 'Approve':
-            #request_pk = request.form['transfer_request']
             cur.execute("update transit_request set approved_by=%s, approved_dt=now() where request_pk=%s;", (session['username'], request_pk, ))
-        #cur.execute("update transit_request set approved_by=%s, approved_dt=now where request_pk=%s;", (session['username'],  request_pk, ))
             error = "transfer request approved"
             conn.commit()
             cur.close()

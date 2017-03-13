@@ -13,7 +13,8 @@ create table users (
     user_pk         varchar(16) primary key,
     -- wanted to allow for a large password if need be to make user feel comfortable
     password        varchar(32),
-    role_fk 		integer REFERENCES roles(role_pk) 
+    role_fk 		integer REFERENCES roles(role_pk),
+    active			boolean default TRUE 
 );
 
 -- create table to store asset data
@@ -21,7 +22,7 @@ create table assets (
 	asset_pk		serial primary key,
 	asset_tag		varchar(16),
 	description		text,
-	disposed		boolean default FALSE	-- when an asset is disposed of this is set to true
+	disposed		timestamp	-- when an asset is disposed of this is set to true
 );
 
 -- create table to store facility data
