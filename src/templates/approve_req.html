@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>Transfer Request</title>
+    <title>Approve Request</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
   </head>
   <body>
@@ -13,7 +13,7 @@
             <h3>{{ t }}</h3>
        		{% endfor %}  
        {% endfor %}
-      <form action="{{url_for('transfer_req')}}" method="POST">
+      <form action="{{url_for('approve_req')}}" method="POST">
 	<select name="transfer_request">
           {% for r in request_pk %}
             <option name="transfer_request">{{ r[0] }}</option>
