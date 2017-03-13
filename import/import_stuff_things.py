@@ -24,14 +24,14 @@ def importUsers():
 	    		role = 1
 	    	else:
 	    		role = 2
-	    		print("insert into users values (%s,%s,%s,%s)" % (row['username'], row['password'], role, row['active']))
+	    		print("insert into users values (%s, %s, %s, %s);" % (row['username'], row['password'], role, row['active']))
 
 def importFacilities():
 	fullname = os.path.join(import_path,"facilities.csv")
 	with open(fullname) as csvfile:
 	    reader = csv.DictReader(csvfile)
 	    for row in reader:
-	    	print("insert into facilities (name, code) values (%s,%s)" % (row['fcode'], row['common_name']))
+	    	print("insert into facilities (name, code) values (%s, %s);" % (row['fcode'], row['common_name']))
 
 def importAssets():
 	fullname = os.path.join(import_path,"assets.csv")
