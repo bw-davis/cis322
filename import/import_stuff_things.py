@@ -43,7 +43,7 @@ def importAssets():
 	    for row in reader:
 	    	cur.execute("select facility_pk from facilities where code=%s;", (row['facility'], ))
 	    	facility_fk = cur.fetchone()[0]
-	    	cur.execute("insert into assets values (%s, %s, %s);", (row['asset_tag'], row['description'], row['disposed'], ))
+	    	cur.execute("insert into assets (asset_tag, description, disposed) values (%s, %s, %s);", (row['asset_tag'], row['description'], row['disposed'], ))
 	    	cur.execute("insert into asset_at (asset_fk, facility_fk, arrive_dt) values (%s, %s, %s);", (count, facility_fk, row['acquired'], ))
 	    	count += 1
 	    	conn.commit()
