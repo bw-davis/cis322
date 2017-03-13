@@ -36,7 +36,7 @@ create table facilities (
 create table asset_at (
     asset_fk    integer REFERENCES assets(asset_pk) not null,
     facility_fk integer REFERENCES facilities(facility_pk) not null,
-    arrive_dt   timestamp default now(),
+    arrive_dt   timestamp,
     depart_dt   timestamp -- when an asset is disposed of this get's filled in
 );
 
@@ -45,7 +45,7 @@ create table transit_request (
 	request_pk					serial primary key,
 	summary						varchar(16),
 	requester					varchar(16) REFERENCES users(user_pk),		-- person who requested asset transfer
-	create_dt					timestamp default now(),				-- timestamp of when request is created
+	create_dt					timestamp,				-- timestamp of when request is created
 	asset_fk 					integer REFERENCES assets(asset_pk),	-- asset being transferred
 	source_facility_fk			integer REFERENCES facilities(facility_pk),	-- facility asset is leaving
 	destination_facility_fk		integer REFERENCES facilities(facility_pk), -- facility asset is going to

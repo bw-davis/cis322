@@ -102,6 +102,7 @@ def add_asset():
         if count != 1:
             cur.execute("insert into assets (asset_tag, description) values (%s, %s);", (tag, description))
             cur.execute("insert into asset_at (asset_fk, facility_fk) select asset_pk, facility_pk from assets a, facilities f where a.asset_tag=%s and f.code=%s;", (tag, facility_code))
+            cur.execute("update asset_at set arrive_dt=%s select asset_fk from assets where asset_tag=%s;", (datetime.datetime.utcnow().isoformat(), tag))
             good = "asset added successfully"
             conn.commit()
         else:
@@ -125,7 +126,7 @@ def dispose_asset():
         asset_tag = request.form['asset_tag']
         conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
         cur = conn.cursor()
-        cur.execute("insert into asset_at (depart_dt) values (%s) select asset_pk, facility_pk from assets a, facilities f where a.asset_tag=%s and f.code=%s;", (now(), tag, facility_code))
+        cur.execute("insert into asset_at (depart_dt) values (%s) select asset_pk, facility_pk from assets a, facilities f where a.asset_tag=%s and f.code=%s;", (datetime.datetime.utcnow().isoformat(), tag, facility_code))
         good = "asset disposed"
         conn.commit()
         cur.close()
@@ -171,7 +172,7 @@ def transfer_req():
         if count == 0:
             cur.execute("select facility_fk from asset_at where asset_fk=%s;", (asset_fk, ))
             source_facility = cur.fetchone()[0]
-            cur.execute("insert into transit_request (requester, asset_fk, source_facility_fk, destination_facility_fk, summary) values (%s, %s, %s, %s, %s);", (requester, asset_fk, source_facility, destination_facility, summary, ))
+            cur.execute("insert into transit_request (requester, create_dt, asset_fk, source_facility_fk, destination_facility_fk, summary) values (%s, %s, %s, %s, %s, %s);", (requester, datetime.datetime.utcnow().isoformat(), asset_fk, source_facility, destination_facility, summary, ))
             good = "transfer request created successfully"
             conn.commit()
             cur.close()
@@ -207,7 +208,7 @@ def approve_req():
             error = "You rejected the request and it was deleted"
             return render_template('dashboard.html', error=error)
         if request.form['option'] == 'Approve':
-            cur.execute("update transit_request set approved_by=%s, approved_dt=now() where request_pk=%s;", (session['username'], request_pk, ))
+            cur.execute("update transit_request set approved_by=%s, approved_dt=%s where request_pk=%s;", (session['username'], datetime.datetime.utcnow().isoformat(), request_pk, ))
             error = "transfer request approved"
             conn.commit()
             cur.close()
