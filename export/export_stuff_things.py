@@ -61,7 +61,7 @@ def exportAssets():
 	    	else:
 	    		cur.execute("select arrive_dt, facility_fk from asset_at where asset_fk=%s;", (r[0], ))
 	    		asset_at = cur.fetchall()
-	    		disposed = 'FALSE'
+	    		disposed = 'NULL'
 	    	cur.execute("select code from facilities where facility_pk=%s;", (asset_at[0][1], ))
 	    	facility = cur.fetchone()[0]
 	    	writer.writerow({'asset_tag': r[1], 'description': r[2], 'facility': facility, 'acquired': asset_at[0][0], 'disposed': disposed})
