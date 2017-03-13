@@ -18,30 +18,30 @@ def importUsers():
 	fullname = os.path.join(import_path,"users.csv")
 	#with open(fullname, 'w') as csvfile:
 	with open(fullname) as csvfile:
-    reader = csv.DictReader(csvfile)
-    for row in reader:
-        print(row['username'], row['password'], row['role'], row['active'])
+	    reader = csv.DictReader(csvfile)
+	    for row in reader:
+	        print(row['username'], row['password'], row['role'], row['active'])
 def importFacilities():
 	fullname = os.path.join(import_path,"facilities.csv")
 	#with open(fullname, 'w') as csvfile:
 	with open(fullname) as csvfile:
-    reader = csv.DictReader(csvfile)
-    for row in reader:
-        print(row['fcode'], row['common_name'])
+	    reader = csv.DictReader(csvfile)
+	    for row in reader:
+	        print(row['fcode'], row['common_name'])
 def importAssets():
 	fullname = os.path.join(import_path,"assets.csv")
 	#with open(fullname, 'w') as csvfile:
 	with open(fullname) as csvfile:
-    reader = csv.DictReader(csvfile)
-    for row in reader:
-        print(row['asset_tag'], row['description'], row['facility'], row['aquired'], row['disposed'])
+	    reader = csv.DictReader(csvfile)
+	    for row in reader:
+	        print(row['asset_tag'], row['description'], row['facility'], row['aquired'], row['disposed'])
 def importTransfers():
 	fullname = os.path.join(import_path,"transfers.csv")
 	#with open(fullname, 'w') as csvfile:
 	with open(fullname) as csvfile:
-    reader = csv.DictReader(csvfile)
-    for row in reader:
-        print(row['asset_tag'], row['request_by'], row['request_dt'], row['approve_by'], row['approve_dt'], row['source'], row['destination'], row['load_dt'], row['unload_dt'])
+	    reader = csv.DictReader(csvfile)
+	    for row in reader:
+	        print(row['asset_tag'], row['request_by'], row['request_dt'], row['approve_by'], row['approve_dt'], row['source'], row['destination'], row['load_dt'], row['unload_dt'])
 
 
 
