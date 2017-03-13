@@ -81,11 +81,15 @@ def add_facility():
 @app.route("/add_asset", methods=('GET', 'POST'))
 def add_asset():
     error = None
+    conn = psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
+    cur = conn.cursor()
+    cur.execute("select code from facilities;")
+    facilities = cur.fetchall()
     if request.method=='GET':
-        conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
-        cur = conn.cursor()
-        cur.execute("select code from facilities;")
-        facilities = cur.fetchall()
+        #conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
+        #cur = conn.cursor()
+        #cur.execute("select code from facilities;")
+        #facilities = cur.fetchall()
         return render_template('add_asset.html', facilities=facilities)
     if request.method=='POST':
         tag = request.form['tag']
@@ -105,7 +109,7 @@ def add_asset():
             return render_template('add_asset.html', error=error)
         cur.close()
         conn.close()
-        return render_template('add_asset.html', good=good)
+        return render_template('add_asset.html', good=good, facilities=facilities)
     return render_template('add_asset.html', error=error)
 
 @app.route("/dispose_asset", methods=('GET', 'POST'))

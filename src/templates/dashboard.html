@@ -46,5 +46,8 @@ div.tab a:focus, .active {
 	<a href="{{url_for('transfer_report')}}" class="tablinks">Transfer Report</a>
 </div><br/>
 	hello {{ username }}!!
+	{% if error %}
+	<p class="error"><strong>{{ error }}</strong>
+	{% endif %}
 </body>
 </html> 
