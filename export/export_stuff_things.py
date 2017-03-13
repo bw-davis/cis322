@@ -62,14 +62,51 @@ def exportAssets():
 	    		cur.execute("select arrive_dt, facility_fk from asset_at where asset_fk=%s;", (r[0], ))
 	    		asset_at = cur.fetchall()
 	    		disposed = 'NULL'
-	    	cur.execute("select name from facilities where facility_pk=%s;", (asset_at[0][1], ))
+	    	cur.execute("select code from facilities where facility_pk=%s;", (asset_at[0][1], ))
 	    	facility = cur.fetchone()[0]
 	    	writer.writerow({'asset_tag': r[1], 'description': r[2], 'facility': facility, 'acquired': asset_at[0][0], 'disposed': disposed})
+
+def exportTransfers():
+	fullname = os.path.join(export_path,"transfers.csv")
+	cur.execute("select * from transit_request;")
+	row = cur.fetchall()
+
+	with open(fullname, 'w') as csvfile:
+	    fieldnames = ['asset_tag', 'request_by', 'request_dt', 'approve_by', 'approve_dt', 'source', 'destination', 'load_dt', 'unload_dt']
+	    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+	    writer.writeheader()
+	    
+	    for r in row:
+	    	cur.execute("select asset_tag from assets where asset_pk=%s;", (r[4]))
+	    	asset_tag = cur.fetchone()[0]
+	    	request_by = r[2]
+	    	request_dt = r[3]
+	    	approve_by = ''
+	    	approve_dt = ''
+	    	load_dt = ''
+	    	unload_dt = ''
+	    	if not r[7]:
+	    		approve_by = 'NULL'
+	    		approve_dt = 'NULL'
+	    		load_dt = 'NULL'
+	    		unload_dt = 'NULL'
+	    	else:
+	    		approve_by = r[7]
+	    		approve_dt = r[8]
+	    		load_dt = r[9]
+	    		unload_dt = r[10]
+	    	cur.execute("select code from facilities where facility_pk=%s;", (r[6], ))
+	    	source = cur.fetchone()[0]
+	    	cur.execute("select code from facilities where facility_pk=%s;", (r[7], ))
+	    	destination = cur.fetchone()[0]
+	    	writer.writerow({'asset_tag': asset_tag, 'request_by': request_by, 'request_dt': request_dt, 'approve_by': approve_by, 'approve_dt': approve_dt, 'source': source, 'destination': destination, 'load_dt': load_dt, 'unload_dt': unload_dt})
 
 def main():
     exportUsers()
     exportFacilities()
     exportAssets()
+    exportTransfers()
     # with open('inv_load.sql','w') as f:
     #     process_inventory(f,sys.argv[1])
 
