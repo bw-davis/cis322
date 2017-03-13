@@ -24,7 +24,7 @@ def importUsers():
 	    		role = 1
 	    	else:
 	    		role = 2
-	    		cur.execute("insert into users values (%s, %s, %s, %s);", (row['username'], row['password'], role, row['active'], ))
+	    	cur.execute("insert into users values (%s, %s, %s, %s);", (row['username'], row['password'], role, row['active'], ))
 	    	conn.commit()
 
 def importFacilities():
