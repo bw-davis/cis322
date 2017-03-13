@@ -39,7 +39,7 @@ def exportFacilities():
 
 	    writer.writeheader()
 	    for r in row:
-	    	writer.writerow({'fcode': r[1], 'common_name': r[2]})
+	    	writer.writerow({'fcode': r[2], 'common_name': r[1]})
 
 def exportAssets():
 	fullname = os.path.join(export_path,"assets.csv")
