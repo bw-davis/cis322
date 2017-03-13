@@ -16,28 +16,32 @@ cur = conn.cursor()
 
 def importUsers():
 	fullname = os.path.join(import_path,"users.csv")
-	#with open(fullname, 'w') as csvfile:
 	with open(fullname) as csvfile:
 	    reader = csv.DictReader(csvfile)
 	    for row in reader:
-	        print(row['username'], row['password'], row['role'], row['active'])
+	    	role = 0
+	    	if row['role'] == 'Logistics Officer':
+	    		role = 1
+	    	else:
+	    		role = 2
+	        print("insert into users values (%s,%s,%s,%s)" % (row['username'], row['password'], role, row['active']))
+
 def importFacilities():
 	fullname = os.path.join(import_path,"facilities.csv")
-	#with open(fullname, 'w') as csvfile:
 	with open(fullname) as csvfile:
 	    reader = csv.DictReader(csvfile)
 	    for row in reader:
-	        print(row['fcode'], row['common_name'])
+	        print("insert into facilities (name, code) values (%s,%s)" % (row['fcode'], row['common_name']))
+
 def importAssets():
 	fullname = os.path.join(import_path,"assets.csv")
-	#with open(fullname, 'w') as csvfile:
 	with open(fullname) as csvfile:
 	    reader = csv.DictReader(csvfile)
 	    for row in reader:
-	        print(row['asset_tag'], row['description'], row['facility'], row['aquired'], row['disposed'])
+	        print(row['asset_tag'], row['description'], row['facility'], row['acquired'], row['disposed'])
+
 def importTransfers():
 	fullname = os.path.join(import_path,"transfers.csv")
-	#with open(fullname, 'w') as csvfile:
 	with open(fullname) as csvfile:
 	    reader = csv.DictReader(csvfile)
 	    for row in reader:
