@@ -59,7 +59,10 @@ def importTransfers():
 	    	source_fk = cur.fetchone()[0]
 	    	cur.execute("select facility_pk from facilities where code=%s;", (row['destination'], ))
 	    	destination_fk = cur.fetchone()[0]
-	    	cur.execute("insert into transit_request (requester, create_dt, asset_fk, source_facility_fk, destination_facility_fk, approved_by, approved_dt, load_time, unload_time) values (%s, %s, %s, %s, %s, %s, %s, %s, %s)", (row['request_by'], row['request_dt'], asset_fk, source_fk, destination_fk, row['approve_by'], row['approve_dt'], row['load_dt'], row['unload_dt'], ))
+	    	if row['approve_by'] == 'NULL':
+	    		cur.execute("insert into transit_request (requester, create_dt, asset_fk, source_facility_fk, destination_facility_fk) values (%s, %s, %s, %s, %s)", (row['request_by'], row['request_dt'], asset_fk, source_fk, destination_fk, ))
+	    	else:
+	    		cur.execute("insert into transit_request (requester, create_dt, asset_fk, source_facility_fk, destination_facility_fk, approved_by, approved_dt, load_time, unload_time) values (%s, %s, %s, %s, %s, %s, %s, %s, %s)", (row['request_by'], row['request_dt'], asset_fk, source_fk, destination_fk, row['approve_by'], row['approve_dt'], row['load_dt'], row['unload_dt'], ))
 	    	conn.commit()
 
 
