@@ -24,14 +24,16 @@ def importUsers():
 	    		role = 1
 	    	else:
 	    		role = 2
-	    		print("insert into users values (%s, %s, %s, %s);" % (row['username'], row['password'], role, row['active']))
+	    		cur.execute("insert into users values (%s, %s, %s, %s);", (row['username'], row['password'], role, row['active'], ))
+	    	conn.commit()
 
 def importFacilities():
 	fullname = os.path.join(import_path,"facilities.csv")
 	with open(fullname) as csvfile:
 	    reader = csv.DictReader(csvfile)
 	    for row in reader:
-	    	print("insert into facilities (name, code) values (%s, %s);" % (row['fcode'], row['common_name']))
+	    	cur.execute("insert into facilities (name, code) values (%s, %s);", (row['fcode'], row['common_name'], ))
+	    	conn.commit()
 
 def importAssets():
 	fullname = os.path.join(import_path,"assets.csv")
@@ -41,9 +43,10 @@ def importAssets():
 	    for row in reader:
 	    	cur.execute("select facility_pk from facilities where code=%s;", (row['facility'], ))
 	    	facility_fk = cur.fetchone()[0]
-	    	print("insert into assets values (%s, %s, %s);" % (row['asset_tag'], row['description'], row['disposed']))
-	    	print("insert into asset_at (asset_fk, facility_fk, arrive_dt) values (%s, %s, %s);" % (count, facility_fk, row['acquired']))
+	    	cur.execute("insert into assets values (%s, %s, %s);", (row['asset_tag'], row['description'], row['disposed'], ))
+	    	cur.execute("insert into asset_at (asset_fk, facility_fk, arrive_dt) values (%s, %s, %s);", (count, facility_fk, row['acquired'], ))
 	    	count += 1
+	    	conn.commit()
 
 def importTransfers():
 	fullname = os.path.join(import_path,"transfers.csv")
@@ -56,7 +59,8 @@ def importTransfers():
 	    	source_fk = cur.fetchone()[0]
 	    	cur.execute("select facility_pk from facilities where code=%s;", (row['destination'], ))
 	    	destination_fk = cur.fetchone()[0]
-	    	print("insert into transit_request (requester, create_dt, asset_fk, source_facility_fk, destination_facility_fk, approved_by, approved_dt, load_time, unload_time) values (%s, %s, %s, %s, %s, %s, %s, %s, %s)" % (row['request_by'], row['request_dt'], asset_fk, source_fk, destination_fk, row['approve_by'], row['approve_dt'], row['load_dt'], row['unload_dt']))
+	    	cur.execute("insert into transit_request (requester, create_dt, asset_fk, source_facility_fk, destination_facility_fk, approved_by, approved_dt, load_time, unload_time) values (%s, %s, %s, %s, %s, %s, %s, %s, %s)", (row['request_by'], row['request_dt'], asset_fk, source_fk, destination_fk, row['approve_by'], row['approve_dt'], row['load_dt'], row['unload_dt'], ))
+	    	conn.commit()
 
 
 
