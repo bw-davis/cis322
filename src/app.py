@@ -160,17 +160,15 @@ def transfer_req():
         facility_code = request.form['destination_facility']
         requester = session['username']
         summary = request.form['summary']
-        # conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
-        # cur = conn.cursor()
         cur.execute("select asset_pk from assets where asset_tag=%s;", (asset_tag, ))
         asset_fk = cur.fetchone()[0]
         cur.execute("select facility_pk from facilities where code=%s;", (facility_code, ))
-        source_facility = cur.fetchone()[0]
-        cur.execute("select count(*) from asset_at where asset_fk=%s and facility_fk=%s;", (asset_fk, source_facility, ))
+        destination_facility = cur.fetchone()[0]
+        cur.execute("select count(*) from asset_at where asset_fk=%s and facility_fk=%s;", (asset_fk, destination_facility, ))
         count = cur.fetchone()[0]
         if count == 0:
-            cur.execute("select facility_pk from facilities where code=%s;", (facility_code, ))
-            destination_facility = cur.fetchone()[0]
+            cur.execute("select transfer_fk from asset_at where asset_fk=%s;", (asset_fk, ))
+            source_facility = cur.fetchone()[0]
             cur.execute("insert into transit_request (requester, asset_fk, source_facility_fk, destination_facility_fk, summary) values (%s, %s, %s, %s);", (requester, asset_fk, source_facility, destination_facility, summary, ))
             good = "transfer request created successfully"
             conn.commit()
