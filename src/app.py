@@ -32,13 +32,11 @@ def create_user():
         cur.close()
         conn.close()
         return render_template('dashboard.html', username=username)
-    return render_template('login.html', error=error)
+    return render_template('error.html', error=error)
 
 @app.route("/activate_user", methods=('POST', ))
 def activate_user():
-    error = None
-    # if request.method=='GET':
-    #     return render_template('create_user.html')
+    error = "Request Wasn't Sent as POST"
     if request.method=='POST':
         username = request.form['username']
         password = request.form['password']
@@ -50,6 +48,9 @@ def activate_user():
         count = cur.fetchone()[0]
         if count == 1:
             cur.execute("update users set password=%s, active='TRUE' where user_pk=%s;", (password, username, ))
+            conn.commit()
+            cur.close()
+            conn.close()
             return "user's password was updated and their account is now active"
         if role == 'facofc':
             cur.execute("insert into users values (%s, %s, 2);", (username, password))
@@ -63,12 +64,28 @@ def activate_user():
         conn.commit()
         cur.close()
         conn.close()
-        return render_template('dashboard.html', username=username)
-    return render_template('login.html', error=error)
+        return "user added successfully"
+    return render_template('error.html', error=error)
+
+@app.route("/revoke_user", methods=('POST', ))
+def revoke_user():
+    error = "Request Wasn't Sent as POST"
+    if request.method=='POST':
+        username = request.form['username']
+        conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
+        cur = conn.cursor()
+        cur.execute("update users set active='FALSE' where user_pk=%s;", (username, ))
+        conn.commit()
+        cur.close()
+        conn.close()
+        error = "users account revoked"
+        return error
+    return error
 
 @app.route("/")
 @app.route("/login", methods=('GET', 'POST'))
 def login():
+    error = None
     if request.method=='GET':
         return render_template('login.html')
     if request.method=='POST':
@@ -83,6 +100,11 @@ def login():
             cur.close()
             conn.close()
         else:
+            cur.execute("select active from users where user_pk=%s;", (username, ))
+            active = cur.fetchone()[0]
+            if active == 'FALSE':
+                error = "Your account is revoked. Contact sysadmin"
+                return error
             session['username'] = username
             session['password'] = password
             return render_template('dashboard.html', username=username)
