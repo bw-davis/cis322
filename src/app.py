@@ -34,6 +34,7 @@ def create_user():
         return render_template('dashboard.html', username=username)
     return render_template('login.html', error=error)
 
+@app.route("/activate_user", methods=('POST', ))
 def activate_user():
     error = None
     # if request.method=='GET':
