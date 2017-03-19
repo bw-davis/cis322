@@ -184,7 +184,6 @@ def transfer_req():
 
 @app.route("/approve_req", methods=('GET', 'POST'))
 def approve_req():
-    def approve_req():
     error = None
     conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
     cur = conn.cursor()

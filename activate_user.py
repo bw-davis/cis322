@@ -27,7 +27,7 @@ def main():
     data = urlencode(args)
     
     # Make the resquest
-    my_route = "activate_user"
+    my_route = "create_user"
     req = Request(sys.argv[1] + my_route, data.encode('ascii'),method='POST')
     # just need to return a string success
     res = urlopen(req)
