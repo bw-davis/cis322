@@ -102,7 +102,7 @@ def login():
         else:
             cur.execute("select active from users where user_pk=%s;", (username, ))
             active = cur.fetchone()[0]
-            if active == 'FALSE':
+            if active == False:
                 error = "Your account is revoked. Contact sysadmin"
                 return error
             session['username'] = username
