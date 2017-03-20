@@ -8,11 +8,9 @@ from configure import dbname, dbhost, dbport
 app = Flask(__name__)
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 
-@app.route("/create_user", methods=('GET', 'POST'))
-def create_user():
-    error = None
-    if request.method=='GET':
-        return render_template('create_user.html')
+@app.route("/activate_user", methods=('POST', ))
+def activate_user():
+    error = "Request Wasn't Sent as POST"
     if request.method=='POST':
         username = request.form['username']
         password = request.form['password']
@@ -20,23 +18,48 @@ def create_user():
         role = request.form['role']
         conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
         cur = conn.cursor()
-        if role == 'Facilities Officer':
+        cur.execute("select count(*) from users where user_pk=%s;", (username, ))
+        count = cur.fetchone()[0]
+        if count == 1:
+            cur.execute("update users set password=%s, active='TRUE' where user_pk=%s;", (password, username, ))
+            conn.commit()
+            cur.close()
+            conn.close()
+            return "user's password was updated and their account is now active"
+        if role == 'facofc':
             cur.execute("insert into users values (%s, %s, 2);", (username, password))
             session['role'] = 'Facilities Officer'
-        elif role == 'Logistics Officer':
+        elif role == 'logofc':
             cur.execute("insert into users values (%s, %s, 1);", (username, password))
             session['role'] = 'Logistics Officer'
         else:
-            cur.execute("insert into users values (%s, %s);", (username, password))
+            error = "Role was neither 'facofc' nor 'logofc'"
+            return error
         conn.commit()
         cur.close()
         conn.close()
-        return render_template('dashboard.html', username=username)
-    return render_template('login.html', error=error)
+        return "user added successfully"
+    return render_template('error.html', error=error)
+
+@app.route("/revoke_user", methods=('POST', ))
+def revoke_user():
+    error = "Request Wasn't Sent as POST"
+    if request.method=='POST':
+        username = request.form['username']
+        conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
+        cur = conn.cursor()
+        cur.execute("update users set active='FALSE' where user_pk=%s;", (username, ))
+        conn.commit()
+        cur.close()
+        conn.close()
+        error = "users account revoked"
+        return error
+    return error
 
 @app.route("/")
 @app.route("/login", methods=('GET', 'POST'))
 def login():
+    error = None
     if request.method=='GET':
         return render_template('login.html')
     if request.method=='POST':
@@ -51,6 +74,11 @@ def login():
             cur.close()
             conn.close()
         else:
+            cur.execute("select active from users where user_pk=%s;", (username, ))
+            active = cur.fetchone()[0]
+            if active == False:
+                error = "Your account is revoked. Contact sysadmin"
+                return error
             session['username'] = username
             session['password'] = password
             return render_template('dashboard.html', username=username)
@@ -125,7 +153,8 @@ def dispose_asset():
         asset_tag = request.form['asset_tag']
         conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
         cur = conn.cursor()
-        cur.execute("insert into asset_at (depart_dt) values (%s) select asset_pk, facility_pk from assets a, facilities f where a.asset_tag=%s and f.code=%s;", (now(), tag, facility_code))
+        cur.execute("insert into asset_at (depart_dt) values (now()) select asset_pk, facility_pk from assets a, facilities f where a.asset_tag=%s and f.code=%s;", (tag, facility_code, ))
+        cur.execute("update assets set disposed=now() where asset tag=%s;", (tag, ))
         good = "asset disposed"
         conn.commit()
         cur.close()
