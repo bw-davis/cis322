@@ -8,32 +8,6 @@ from configure import dbname, dbhost, dbport
 app = Flask(__name__)
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 
-#@app.route("/create_user", methods=('GET', 'POST'))
-#def create_user():
-#    error = None
-#    if request.method=='GET':
-#        return render_template('create_user.html')
-#    if request.method=='POST':
-#        username = request.form['username']
-#        password = request.form['password']
-#        session['username'] = username
-#        role = request.form['role']
-#        conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
-#        cur = conn.cursor()
-#        if role == 'Facilities Officer':
-#            cur.execute("insert into users values (%s, %s, 2);", (username, password))
-#            session['role'] = 'Facilities Officer'
-#        elif role == 'Logistics Officer':
-#            cur.execute("insert into users values (%s, %s, 1);", (username, password))
-#            session['role'] = 'Logistics Officer'
-#        else:
-#            cur.execute("insert into users values (%s, %s);", (username, password))
-#        conn.commit()
-#        cur.close()
-#        conn.close()
-#        return render_template('dashboard.html', username=username)
-#    return render_template('error.html', error=error)
-
 @app.route("/activate_user", methods=('POST', ))
 def activate_user():
     error = "Request Wasn't Sent as POST"
@@ -179,7 +153,8 @@ def dispose_asset():
         asset_tag = request.form['asset_tag']
         conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
         cur = conn.cursor()
-        cur.execute("insert into asset_at (depart_dt) values (%s) select asset_pk, facility_pk from assets a, facilities f where a.asset_tag=%s and f.code=%s;", (now(), tag, facility_code))
+        cur.execute("insert into asset_at (depart_dt) values (now()) select asset_pk, facility_pk from assets a, facilities f where a.asset_tag=%s and f.code=%s;", (tag, facility_code, ))
+        cur.execute("update assets set disposed=now() where asset tag=%s;", (tag, ))
         good = "asset disposed"
         conn.commit()
         cur.close()
