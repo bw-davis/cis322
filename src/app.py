@@ -160,16 +160,16 @@ def dispose_asset():
     if request.method=='GET':
         conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
         cur = conn.cursor()
-        cur.execute("select asset_tag from assets;")
+        cur.execute("select asset_tag from assets where disposed is NULL;")
         assets = cur.fetchall()
         return render_template('dispose_asset.html', assets=assets)
     if request.method=='POST':
         asset_tag = request.form['asset_tag']
         conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
         cur = conn.cursor()
-        cur.execute("select asset_pk from assets where asset_tag=%s:", (asset_tag, ))
+        cur.execute("select asset_pk from assets where asset_tag=%s;", (asset_tag, ))
         asset_pk = cur.fetchone()[0]
-        cur.execute("insert into asset_at (depart_dt) values (now()) where asset_fk=%s;", (asset_pk, ))
+        cur.execute("update asset_at set depart_dt=now() where asset_fk=%s;", (asset_pk, ))
         cur.execute("update assets set disposed=now() where asset_tag=%s;", (asset_tag, ))
         session['error'] = "asset disposed"
         conn.commit()
