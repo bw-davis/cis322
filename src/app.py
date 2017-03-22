@@ -87,7 +87,7 @@ def login():
                 session['role'] = 'Logistics Officer'
             else:
                 session['role'] = 'Facilities Officer'    
-            return render_template('dashboard.html')
+            return redirect('dashboard')
     return render_template('login.html', error=error)
 
 @app.route("/dashboard", methods=('GET', ))
@@ -120,7 +120,6 @@ def add_facility():
         cur.close()
         conn.close()
         return render_template('dashboard.html', username=session['username'], error=good)
-        #return render_template('add_facility.html', good=good)
     return render_template('add_facility.html', error=error)
 
 @app.route("/add_asset", methods=('GET', 'POST'))
@@ -167,8 +166,8 @@ def dispose_asset():
         asset_tag = request.form['asset_tag']
         conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
         cur = conn.cursor()
-        cur.execute("insert into asset_at (depart_dt) values (now()) select asset_pk, facility_pk from assets a, facilities f where a.asset_tag=%s and f.code=%s;", (tag, facility_code, ))
-        cur.execute("update assets set disposed=now() where asset tag=%s;", (tag, ))
+        cur.execute("insert into asset_at (depart_dt) values (now()) select asset_pk, facility_pk from assets a, facilities f where a.asset_tag=%s and f.code=%s;", (asset_tag, facility_code, ))
+        cur.execute("update assets set disposed=now() where asset_tag=%s;", (asset_tag, ))
         good = "asset disposed"
         conn.commit()
         cur.close()
