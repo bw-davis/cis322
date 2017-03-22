@@ -157,9 +157,14 @@ def add_asset():
 @app.route("/dispose_asset", methods=('GET', 'POST'))
 def dispose_asset():
     error = None
+    conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
+    cur = conn.cursor()
+    cur.execute("select role_fk from users where user_pk=%s;", (session['username'], ))
+    role_fk = cur.fetchone()[0]
+    if role_fk != 1:
+        error = "only Logistics Officers can approve transfers"
+        return render_template('error.html', error=error)
     if request.method=='GET':
-        conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
-        cur = conn.cursor()
         cur.execute("select asset_tag from assets where disposed is NULL;")
         assets = cur.fetchall()
         return render_template('dispose_asset.html', assets=assets)
@@ -197,7 +202,7 @@ def transfer_req():
         error = "only Logistics Officers can request transfers"
         return render_template('error.html', error=error)
     if request.method=='GET':
-        cur.execute("select asset_tag from assets;")
+        cur.execute("select asset_tag from assets where disposed is NULL;")
         session['assets'] = cur.fetchall()
         cur.execute("select code from facilities;")
         session['facilities'] = cur.fetchall()
