@@ -67,12 +67,6 @@ def login():
         password = request.form['password']
         conn = psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
         cur = conn.cursor()
-        cur.execute("select role from users where user_pk=%s;", (username, ))
-        role = cur.fetchone()[0]
-        if role == 1:
-            session['role'] = 'Logistics Officer'
-        else:
-            session['role'] = 'Facilities Officer'
         cur.execute("select count(*) from users where user_pk=%s and password=%s;", (username, password))
         rows = cur.fetchone()[0]
         if rows != 1:
@@ -87,7 +81,13 @@ def login():
                 return error
             session['username'] = username
             session['password'] = password
-            return render_template('dashboard.html', username=username)
+            cur.execute("select role_fk from users where user_pk=%s;", (username, ))
+            role = cur.fetchone()[0]
+            if role == 1:
+                session['role'] = 'Logistics Officer'
+            else:
+                session['role'] = 'Facilities Officer'    
+            return render_template('dashboard.html')
     return render_template('login.html', error=error)
 
 @app.route("/dashboard", methods=('GET', ))
@@ -99,6 +99,10 @@ def dashboard():
         facofc = True
         return render_template('dashboard.html', username=session['username'], facofc=facofc)
     return render_template('dashboard.html', username=session['username'])
+
+@app.route("/load_unload", methods=('GET', ))
+def load_unload():
+    return render_template('load_unload.html')
 
 @app.route("/add_facility", methods=('GET', 'POST'))
 def add_facility():
