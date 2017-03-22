@@ -59,7 +59,7 @@ def revoke_user():
 @app.route("/")
 @app.route("/login", methods=('GET', 'POST'))
 def login():
-    error = None
+    session['error'] = None
     if request.method=='GET':
         return render_template('login.html')
     if request.method=='POST':
@@ -219,7 +219,7 @@ def transfer_req():
             conn.commit()
             cur.close()
             conn.close()
-            return render_template('dashboard.html', username=session['username'], error=good)
+            return redirect('dashboard')
             #return render_template('transfer_req.html', good=good, assets=session['assets'], facilities=session['facilities'])
         else:
             session['error'] = "that asset is already at that facility.  Try again."
