@@ -14,7 +14,7 @@ def activate_user():
     if request.method=='POST':
         username = request.form['username']
         password = request.form['password']
-        session['username'] = username
+        session['error'] = None
         role = request.form['role']
         conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
         cur = conn.cursor()
@@ -94,10 +94,10 @@ def login():
 def dashboard():
     if session['role'] == 'Logistics Officer':
         logofc = True
-        return render_template('dashboard.html', username=session['username'], logofc=logofc)
+        return render_template('dashboard.html', username=session['username'], logofc=logofc, error=session['error'])
     else:
         facofc = True
-        return render_template('dashboard.html', username=session['username'], facofc=facofc)
+        return render_template('dashboard.html', username=session['username'], facofc=facofc, error=session['error'])
     return render_template('dashboard.html', username=session['username'])
 
 @app.route("/load_unload", methods=('GET', ))
@@ -115,11 +115,12 @@ def add_facility():
         conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
         cur = conn.cursor()
         cur.execute("insert into facilities (name, code) values (%s, %s);", (name, code))
-        good = "facility added successfully"
+        session['error'] = "facility added successfully"
         conn.commit()
         cur.close()
         conn.close()
-        return render_template('dashboard.html', username=session['username'], error=good)
+        return redirect('dashboard')
+        #return render_template('dashboard.html', username=session['username'], error=good)
     return render_template('add_facility.html', error=error)
 
 @app.route("/add_asset", methods=('GET', 'POST'))
@@ -142,14 +143,14 @@ def add_asset():
         if count != 1:
             cur.execute("insert into assets (asset_tag, description) values (%s, %s);", (tag, description))
             cur.execute("insert into asset_at (asset_fk, facility_fk) select asset_pk, facility_pk from assets a, facilities f where a.asset_tag=%s and f.code=%s;", (tag, facility_code))
-            good = "asset added successfully"
+            session['error'] = "asset added successfully"
             conn.commit()
         else:
-            error = "duplicate asset"
-            return render_template('dashboard.html', username=session['username'], error=error)
+            session['error'] = "duplicate asset"
+            return redirect('dashboard.html')
         cur.close()
         conn.close()
-        return render_template('dashboard.html', username=session['username'], error=good)
+        return redirect('dashboard')
         # return render_template('add_asset.html', good=good, facilities=facilities)
     return render_template('add_asset.html', error=error)
 
@@ -168,11 +169,11 @@ def dispose_asset():
         cur = conn.cursor()
         cur.execute("insert into asset_at (depart_dt) values (now()) select asset_pk, facility_pk from assets a, facilities f where a.asset_tag=%s and f.code=%s;", (asset_tag, facility_code, ))
         cur.execute("update assets set disposed=now() where asset_tag=%s;", (asset_tag, ))
-        good = "asset disposed"
+        session['error'] = "asset disposed"
         conn.commit()
         cur.close()
         conn.close()
-        return render_template('dashboard.html', username=session['username'], error=good)
+        return redirect('dashboard')
     return render_template('dispose_asset.html', error=error)
 
 @app.route("/asset_report", methods=('GET', 'POST'))
@@ -214,15 +215,15 @@ def transfer_req():
             cur.execute("select facility_fk from asset_at where asset_fk=%s;", (asset_fk, ))
             source_facility = cur.fetchone()[0]
             cur.execute("insert into transit_request (requester, asset_fk, source_facility_fk, destination_facility_fk, summary) values (%s, %s, %s, %s, %s);", (requester, asset_fk, source_facility, destination_facility, summary, ))
-            good = "transfer request created successfully"
+            session['error'] = "transfer request created successfully"
             conn.commit()
             cur.close()
             conn.close()
             return render_template('dashboard.html', username=session['username'], error=good)
             #return render_template('transfer_req.html', good=good, assets=session['assets'], facilities=session['facilities'])
         else:
-            error = "that asset is already at that facility.  Try again."
-            return render_template('transfer_req.html', error=error, assets=session['assets'], facilities=session['facilities'])
+            session['error'] = "that asset is already at that facility.  Try again."
+            return redirect('dashboard')
     return render_template('transfer_req.html', error=error)
 
 @app.route("/approve_req", methods=('GET', 'POST'))
@@ -248,14 +249,14 @@ def approve_req():
         if request.form['option'] == 'Reject':
             cur.execute("delete from transit_request where request_pk=%s;", (request_pk, ))
             conn.commit()
-            error = "You rejected the request and it was deleted"
-            return render_template('dashboard.html', error=error)
+            session['error'] = "You rejected the request and it was deleted"
+            return redirect('dashboard')
         if request.form['option'] == 'Approve':
             cur.execute("update transit_request set approved_by=%s, approved_dt=now() where request_pk=%s;", (session['username'], request_pk, ))
-            error = "transfer request approved"
+            session['error'] = "transfer request approved"
             conn.commit()
             cur.close()
             conn.close()
-            return render_template('dashboard.html', username=session['username'], error=error)
+            return redirect('dashboard')
 if __name__ == "__main__":
     app.run()
