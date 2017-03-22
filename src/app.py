@@ -162,7 +162,7 @@ def dispose_asset():
     cur.execute("select role_fk from users where user_pk=%s;", (session['username'], ))
     role_fk = cur.fetchone()[0]
     if role_fk != 1:
-        error = "only Logistics Officers can approve transfers"
+        error = "only Logistics Officers can dispose assets"
         return render_template('error.html', error=error)
     if request.method=='GET':
         cur.execute("select asset_tag from assets where disposed is NULL;")
