@@ -67,6 +67,12 @@ def login():
         password = request.form['password']
         conn = psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
         cur = conn.cursor()
+        cur.execute("select role from users where user_pk=%s;", (username, ))
+        role = cur.fetchone()[0]
+        if role == 1:
+            session['role'] = 'Logistics Officer'
+        else:
+            session['role'] = 'Facilities Officer'
         cur.execute("select count(*) from users where user_pk=%s and password=%s;", (username, password))
         rows = cur.fetchone()[0]
         if rows != 1:
@@ -86,6 +92,12 @@ def login():
 
 @app.route("/dashboard", methods=('GET', ))
 def dashboard():
+    if session['role'] == 'Logistics Officer':
+        logofc = True
+        return render_template('dashboard.html', username=session['username'], logofc=logofc)
+    else:
+        facofc = True
+        return render_template('dashboard.html', username=session['username'], facofc=facofc)
     return render_template('dashboard.html', username=session['username'])
 
 @app.route("/add_facility", methods=('GET', 'POST'))
@@ -221,20 +233,13 @@ def approve_req():
         error = "only Facilities Officers can approve transfers"
         return render_template('error.html', error=error)
     if request.method=='GET':
-        cur.execute("select request_pk, summary, requester, source_facility_fk, destination_facility_fk from transit_request where approved_by is NULL;")
-        #cur.execute("select request_pk from transit_request where approved_by is NULL;")
+        cur.execute("select request_pk, summary, requester from transit_request where approved_by is NULL;")
         info = cur.fetchall()
-        # summary = info[0]
-        # requester = info[1]
-        # source_facility_fk = info[2]
-        # summary = info[3]
-        cur.execute("select * from transit_request where approved_by is NULL;")
+        cur.execute("select count(*) from transit_request where approved_by is NULL;")
         count = cur.fetchone()[0]
         if count == 1:
             return render_template('approve_req.html', info=info)
-        #transfer_requests = cur.fetchall()
         return render_template('approve_req.html', info=info, count=count)
-        #return render_template('approve_req.html', transfer_requests=transfer_requests, request_pk=request_pk)
     if request.method=='POST':
         request_pk = request.form['transfer_request']
         if request.form['option'] == 'Reject':

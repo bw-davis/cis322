@@ -36,15 +36,26 @@ div.tab a:focus, .active {
 }
 </style>
 <body>
+{% if facofc %}
+    <div class="tab">
+    <a href="{{url_for('add_asset')}}" class="tablinks">Add Asset</a>   
+    <a href="{{url_for('dispose_asset')}}" class="tablinks">Dispose Asset</a>
+    <a href="{{url_for('add_facility')}}" class="tablinks">Add Facility</a>
+    <a href="{{url_for('approve_req')}}" class="tablinks">Approve Transfer Request</a>  
+    <a href="{{url_for('asset_report')}}" class="tablinks">Asset Report</a>
+    <a href="{{url_for('transfer_report')}}" class="tablinks">Transfer Report</a>
+</div><br/>
+{% else %}
 <div class="tab">
 	<a href="{{url_for('add_asset')}}" class="tablinks">Add Asset</a>	
 	<a href="{{url_for('dispose_asset')}}" class="tablinks">Dispose Asset</a>
 	<a href="{{url_for('add_facility')}}" class="tablinks">Add Facility</a>
-	<a href="{{url_for('transfer_req')}}" class="tablinks">Transfer Request</a>
-    <a href="{{url_for('approve_req')}}" class="tablinks">Approve Transfer Request</a>   
+    <a href="{{url_for('approve_req')}}" class="tablinks">Approve Transfer Request</a>
+    <a href="{{url_for('load_unload)}}" class="tablinks">Load/Unload Assets</a>    
 	<a href="{{url_for('asset_report')}}" class="tablinks">Asset Report</a>
 	<a href="{{url_for('transfer_report')}}" class="tablinks">Transfer Report</a>
 </div><br/>
+{% endif %}
 	hello {{ username }}!!
 	{% if error %}
 	<p class="error"><strong>{{ error }}</strong>
