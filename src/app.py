@@ -167,7 +167,9 @@ def dispose_asset():
         asset_tag = request.form['asset_tag']
         conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
         cur = conn.cursor()
-        cur.execute("insert into asset_at (depart_dt) values (now()) select asset_pk, facility_pk from assets a, facilities f where a.asset_tag=%s and f.code=%s;", (asset_tag, facility_code, ))
+        cur.execute("select asset_pk from assets where asset_tag=%s:", (asset_tag, ))
+        asset_pk = cur.fetchone()[0]
+        cur.execute("insert into asset_at (depart_dt) values (now()) where asset_fk=%s;", (asset_pk, ))
         cur.execute("update assets set disposed=now() where asset_tag=%s;", (asset_tag, ))
         session['error'] = "asset disposed"
         conn.commit()
