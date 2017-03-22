@@ -86,7 +86,7 @@ def login():
 
 @app.route("/dashboard", methods=('GET', ))
 def dashboard():
-    return render_template('dashboard.html', username='Brian')
+    return render_template('dashboard.html', username=session['username'])
 
 @app.route("/add_facility", methods=('GET', 'POST'))
 def add_facility():
@@ -103,7 +103,8 @@ def add_facility():
         conn.commit()
         cur.close()
         conn.close()
-        return render_template('add_facility.html', good=good)
+        return render_template('dashboard.html', username=session['username'], error=good)
+        #return render_template('add_facility.html', good=good)
     return render_template('add_facility.html', error=error)
 
 @app.route("/add_asset", methods=('GET', 'POST'))
@@ -114,10 +115,6 @@ def add_asset():
     cur.execute("select code from facilities;")
     facilities = cur.fetchall()
     if request.method=='GET':
-        #conn =  psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
-        #cur = conn.cursor()
-        #cur.execute("select code from facilities;")
-        #facilities = cur.fetchall()
         return render_template('add_asset.html', facilities=facilities)
     if request.method=='POST':
         tag = request.form['tag']
@@ -134,10 +131,11 @@ def add_asset():
             conn.commit()
         else:
             error = "duplicate asset"
-            return render_template('add_asset.html', error=error)
+            return render_template('dashboard.html', username=session['username'], error=error)
         cur.close()
         conn.close()
-        return render_template('add_asset.html', good=good, facilities=facilities)
+        return render_template('dashboard.html', username=session['username'], error=good)
+        # return render_template('add_asset.html', good=good, facilities=facilities)
     return render_template('add_asset.html', error=error)
 
 @app.route("/dispose_asset", methods=('GET', 'POST'))
@@ -159,7 +157,7 @@ def dispose_asset():
         conn.commit()
         cur.close()
         conn.close()
-        return render_template('dispose_asset.html', good=good)
+        return render_template('dashboard.html', username=session['username'], error=good)
     return render_template('dispose_asset.html', error=error)
 
 @app.route("/asset_report", methods=('GET', 'POST'))
@@ -205,7 +203,8 @@ def transfer_req():
             conn.commit()
             cur.close()
             conn.close()
-            return render_template('transfer_req.html', good=good, assets=session['assets'], facilities=session['facilities'])
+            return render_template('dashboard.html', username=session['username'], error=good)
+            #return render_template('transfer_req.html', good=good, assets=session['assets'], facilities=session['facilities'])
         else:
             error = "that asset is already at that facility.  Try again."
             return render_template('transfer_req.html', error=error, assets=session['assets'], facilities=session['facilities'])
@@ -218,15 +217,22 @@ def approve_req():
     cur = conn.cursor()
     cur.execute("select role_fk from users where user_pk=%s;", (session['username'], ))
     role_fk = cur.fetchone()[0]
-    if role_fk != 1:
-        error = "only Logistics Officers can approve transfers"
+    if role_fk != 2:
+        error = "only Facilities Officers can approve transfers"
         return render_template('error.html', error=error)
     if request.method=='GET':
-        cur.execute("select request_pk from transit_request where approved_by is NULL;")
-        request_pk = cur.fetchall()
+        cur.execute("select request_pk, summary, requester, source_facility_fk, destination_facility_fk from transit_request where approved_by is NULL;")
+        #cur.execute("select request_pk from transit_request where approved_by is NULL;")
+        info = cur.fetchall()
+        # summary = info[0]
+        # requester = info[1]
+        # source_facility_fk = info[2]
+        # summary = info[3]
         cur.execute("select * from transit_request where approved_by is NULL;")
-        transfer_requests = cur.fetchall()
-        return render_template('approve_req.html', transfer_requests=transfer_requests, request_pk=request_pk)
+        count = cur.fetchall()
+        #transfer_requests = cur.fetchall()
+        return render_template('approve_req.html', info=info, count=count)
+        #return render_template('approve_req.html', transfer_requests=transfer_requests, request_pk=request_pk)
     if request.method=='POST':
         request_pk = request.form['transfer_request']
         if request.form['option'] == 'Reject':
@@ -240,6 +246,6 @@ def approve_req():
             conn.commit()
             cur.close()
             conn.close()
-            return render_template('dashboard.html', error=error)
+            return render_template('dashboard.html', username=session['username'], error=error)
 if __name__ == "__main__":
     app.run()

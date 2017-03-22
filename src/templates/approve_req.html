@@ -8,9 +8,15 @@
       <h1>Please Select Request To Approve</h1>
       <br>
       <p>Here's a list of requests and their information: </p>
-      {% for t in transfer_requests %}
-            <h3>{{ t }}</h3>  
-       {% endfor %}
+      <h3>ID   SUMMARY          REQUESTER        SOURCE       DESTINATION</h3>
+      {% if count==1 %}
+       <h1>info[0]   info[1]          info[2]        info[3]       info[4]</h1>
+      {% endif %}
+      {% else %}
+      {% for i in len(count) %}
+            <h1>info[i][0]   info[i][1]          info[i][2]        info[i][3]       info[i][4]</h1>
+      {% endfor %}
+       
       <form action="{{url_for('approve_req')}}" method="POST">
 	<select name="transfer_request">
           {% for r in request_pk %}
