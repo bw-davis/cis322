@@ -1,3 +1,2 @@
 cp -r src/* $HOME/wsgi
-cd sql
-psql $1 -f create_tables.sql
+psql $1 -f sql/create_tables.sql
