@@ -13,7 +13,7 @@
        <h1>{{ info[0] }}  {{ info[1] }}        {{ info[2] }}  </h1>
       {% else %}
         {% for i in range(0, count) %}
-            {{ info[i][0] }}           {{ info[i][1] }}              {{ info[i][2] }}    
+            {{ info[i][0] }}           {{ info[i][1] }}              {{ info[i][2] }}<br/>
         {% endfor %}
       {% endif %}
       <form action="{{url_for('approve_req')}}" method="POST">
