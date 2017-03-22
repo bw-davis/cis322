@@ -229,7 +229,9 @@ def approve_req():
         # source_facility_fk = info[2]
         # summary = info[3]
         cur.execute("select * from transit_request where approved_by is NULL;")
-        count = cur.fetchall()
+        count = cur.fetchone()[0]
+        if count == 1:
+            return render_template('approve_req.html', info=info)
         #transfer_requests = cur.fetchall()
         return render_template('approve_req.html', info=info, count=count)
         #return render_template('approve_req.html', transfer_requests=transfer_requests, request_pk=request_pk)
